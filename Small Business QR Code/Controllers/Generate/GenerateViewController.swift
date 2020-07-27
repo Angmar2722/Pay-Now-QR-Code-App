@@ -10,17 +10,220 @@ import UIKit
 
 class GenerateViewController: UIViewController {
     
+    
     //Dimensions of Device Screen
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
+    
+    
+    //Initializing Screen UI Components
+    var makeTransactionAmountTextField : UITextField?
+    var makeReferenceNumberTextField : UITextField?
+    var makeExpiryDateTextField : UITextField?
+    
+    var makeExpiryDateDatePicker : UIDatePicker?
+    var format_YYYY_DD_MM_Date : String?
 
+    var makeQRCodeButton : UIButton?
+    
+    
+    
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        
+        //Adds The Reference Number, Transaction Amount And Expiry Date Labels
+        let makeTransactionAmountTextFieldLabel = generateTransactionAmountTextFieldLabel()
+        let makeReferenceNumberTextFieldLabel = generateReferenceNumberTextFieldLabel()
+        let makeExpiryDateTextFieldLabel = generateExpiryDateTextFieldLabel()
+        
+        view.addSubview(makeTransactionAmountTextFieldLabel)
+        view.addSubview(makeReferenceNumberTextFieldLabel)
+        view.addSubview(makeExpiryDateTextFieldLabel)
+        
+        
+        //Adds The Reference Number, Transaction Amount And Expiry Date Text Fields To The View
+        makeTransactionAmountTextField = generateTransactionAmountTextField()
+        makeReferenceNumberTextField = generateReferenceNumberTextField()
+        makeExpiryDateTextField = generateExpiryDateTextField()
+        
+        makeTransactionAmountTextField!.delegate = self
+        makeReferenceNumberTextField!.delegate = self
+        makeExpiryDateTextField!.delegate = self
+        
+        view.addSubview(makeTransactionAmountTextField!)
+        view.addSubview(makeReferenceNumberTextField!)
+        view.addSubview(makeExpiryDateTextField!)
+        
         //Adds The Make QR Code Button To The View
-        let makeQRCodeButton = generateQRCodeButton()
-        view.addSubview(makeQRCodeButton)
+        makeQRCodeButton = generateQRCodeButton()
+        view.addSubview(makeQRCodeButton!)
+        
+        
+        //Adds the Date Picker To The Expiry Date Text Field To Select The Expiry Date
+        let expiryDateDatePicker = UIDatePicker()
+        
+        expiryDateDatePicker.datePickerMode = .date
+        expiryDateDatePicker.addTarget(self, action: #selector(GenerateViewController.dateChanged(datePicker:)), for: .valueChanged)
+        
+        makeExpiryDateTextField?.inputView = expiryDateDatePicker
+
+        
+        //Adds the Tap Gesture Where The User Can Tap Elsewhere On The Screen When The Date Picker Is Selected To De-Select The Date Picker
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(GenerateViewController.viewTapped(gestureRecognizer:)))
+        view.addGestureRecognizer(tapGesture)
+        
+        
+    }
+    
+    //When The User Taps On The Specified Selector, The Editing Is Dismissed (In This Instance, The Editing Is For The Date Picker)
+    @objc func viewTapped(gestureRecognizer : UITapGestureRecognizer) {
+        view.endEditing(true)
+    }
+    
+    
+    @objc func dateChanged(datePicker : UIDatePicker) {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM/yyyy"
+        
+        makeExpiryDateTextField?.text = dateFormatter.string(from: datePicker.date)
+        
+    }
+    
+    
+    
+    func generateTransactionAmountTextFieldLabel() -> UILabel {
+        
+        let transactionAmountTextFieldLabel = UILabel()
+        
+        //Label Text Features
+        transactionAmountTextFieldLabel.text = "Amount ($)"
+        transactionAmountTextFieldLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
+        transactionAmountTextFieldLabel.textColor = UIColor.black
+        transactionAmountTextFieldLabel.adjustsFontSizeToFitWidth = true
+        
+        //Label Text Field Dimensions And Co-Ordinates
+        transactionAmountTextFieldLabel.frame = CGRect(x: CGFloat( (30 / 414) * screenWidth), y: CGFloat( (130 / 896) * screenHeight), width: CGFloat( (120 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
+        
+        //Label Text Field Background / Border Attributes
+        transactionAmountTextFieldLabel.backgroundColor = UIColor.white
+        
+        return transactionAmountTextFieldLabel
+        
+    }
+    
+    func generateReferenceNumberTextFieldLabel() -> UILabel {
+        
+        let referenceNumberTextFieldLabel = UILabel()
+        
+        //Label Text Features
+        referenceNumberTextFieldLabel.text = "Ref No"
+        referenceNumberTextFieldLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
+        referenceNumberTextFieldLabel.textColor = UIColor.black
+        referenceNumberTextFieldLabel.adjustsFontSizeToFitWidth = true
+        
+        //Label Text Field Dimensions And Co-Ordinates
+        referenceNumberTextFieldLabel.frame = CGRect(x: CGFloat( (30 / 414) * screenWidth), y: CGFloat( (190 / 896) * screenHeight), width: CGFloat( (120 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
+        
+        //Label Text Field Background / Border Attributes
+        referenceNumberTextFieldLabel.backgroundColor = UIColor.white
+        
+        return referenceNumberTextFieldLabel
+        
+    }
+    
+    func generateExpiryDateTextFieldLabel() -> UILabel {
+        
+        let expiryDateTextFieldLabel = UILabel()
+        
+        //Label Text Features
+        expiryDateTextFieldLabel.text = "Exp Date"
+        expiryDateTextFieldLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
+        expiryDateTextFieldLabel.textColor = UIColor.black
+        expiryDateTextFieldLabel.adjustsFontSizeToFitWidth = true
+        
+        //Label Text Field Dimensions And Co-Ordinates
+        expiryDateTextFieldLabel.frame = CGRect(x: CGFloat( (30 / 414) * screenWidth), y: CGFloat( (250 / 896) * screenHeight), width: CGFloat( (120 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
+        
+        //Label Text Field Background / Border Attributes
+        expiryDateTextFieldLabel.backgroundColor = UIColor.white
+        
+        return expiryDateTextFieldLabel
+        
+    }
+    
+    
+    
+    func generateTransactionAmountTextField() -> UITextField {
+
+        let transactionAmountTextField = UITextField()
+        
+        //Text Field Text Features
+        transactionAmountTextField.placeholder = "E.g. 100.11"
+        transactionAmountTextField.textAlignment = .center
+        transactionAmountTextField.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
+        transactionAmountTextField.textColor = UIColor.black
+        transactionAmountTextField.adjustsFontSizeToFitWidth = true
+        
+        //Text Field Dimensions And Co-Ordinates
+        transactionAmountTextField.frame = CGRect(x: CGFloat( (150 / 414) * screenWidth), y: CGFloat( (130 / 896) * screenHeight), width: CGFloat( (234 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
+        
+        //Text Field Background / Border Attributes
+        transactionAmountTextField.layer.borderWidth = 2
+        transactionAmountTextField.backgroundColor = UIColor.white
+        
+        
+        return transactionAmountTextField
+        
+    }
+    
+    func generateReferenceNumberTextField() -> UITextField {
+
+        let referenceNumberTextField = UITextField()
+        
+        //Text Field Text Features
+        referenceNumberTextField.placeholder = "E.g. Mr. Lee Bill"
+        referenceNumberTextField.textAlignment = .center
+        referenceNumberTextField.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
+        referenceNumberTextField.textColor = UIColor.black
+        referenceNumberTextField.adjustsFontSizeToFitWidth = true
+        
+        //Text Field Dimensions And Co-Ordinates
+        referenceNumberTextField.frame = CGRect(x: CGFloat( (150 / 414) * screenWidth), y: CGFloat( (190 / 896) * screenHeight), width: CGFloat( (234 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
+        
+        //Text Field Background / Border Attributes
+        referenceNumberTextField.layer.borderWidth = 2
+        referenceNumberTextField.backgroundColor = UIColor.white
+        
+        
+        return referenceNumberTextField
+        
+    }
+    
+    func generateExpiryDateTextField() -> UITextField {
+
+        let expiryDateTextField = UITextField()
+        
+        //Text Field Text Features
+        expiryDateTextField.placeholder = "Pick Date (Optional)"
+        expiryDateTextField.textAlignment = .center
+        expiryDateTextField.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
+        expiryDateTextField.textColor = UIColor.black
+        expiryDateTextField.adjustsFontSizeToFitWidth = true
+        
+        //Text Field Dimensions And Co-Ordinates
+        expiryDateTextField.frame = CGRect(x: CGFloat( (150 / 414) * screenWidth), y: CGFloat( (250 / 896) * screenHeight), width: CGFloat( (234 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
+        
+        //Text Field Background / Border Attributes
+        expiryDateTextField.layer.borderWidth = 2
+        expiryDateTextField.backgroundColor = UIColor.white
+        
+        
+        return expiryDateTextField
+        
     }
     
     
@@ -30,12 +233,16 @@ class GenerateViewController: UIViewController {
         let makeQRCodeButton = UIButton()
         
         //Button Title Text Features
-        makeQRCodeButton.setTitle("Click To Make A QR Code", for: .normal)
+        makeQRCodeButton.setTitle("Generate QR ", for: .normal)
         makeQRCodeButton.titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (32 / 896) * screenHeight ))
         makeQRCodeButton.titleLabel?.adjustsFontSizeToFitWidth = true
         
         //Button Dimensions And Co-Ordinates
-        makeQRCodeButton.frame = CGRect( x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (180 / 896) * screenHeight), width: CGFloat( (334 / 414) * screenWidth), height: CGFloat( (90 / 896) * screenHeight) )
+        makeQRCodeButton.frame = CGRect( x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (330 / 896) * screenHeight), width: CGFloat( (334 / 414) * screenWidth), height: CGFloat( (60 / 896) * screenHeight) )
+        
+        //Button Frame Attributes
+        makeQRCodeButton.layer.cornerRadius = CGFloat( (25 / 896) * screenHeight)
+        print("The Make QR Code Button Corner Radius For This Phone Is \(makeQRCodeButton.layer.cornerRadius) For iPhone 11 It Is 25.0")
         
         makeQRCodeButton.backgroundColor = .systemBlue
         
@@ -45,208 +252,80 @@ class GenerateViewController: UIViewController {
     }
     
     
+    
     //The Action Which Occurs When The Generate QR Code Button Is Clicked
     @objc func generateQRCodeButtonClicked(sender:UIButton) {
         
+        //Dismisses The Date Picker If the User Clicks On The Generate QR Button While The Date Picker Is Selected
+        view.endEditing(true)
         
         
         
-        //Creating The PayNow QR Code String
-        
-        let UEN = "201101550Z"
-        let expiryDate = "20201127"
-        let transactionAmount = "99999.99"
-        let companyName = "Qryptal"
-        let referenceNumber = "AnshulTest"
-        
-        //Payload Format Indicator String
-        let payloadFormatIndicatorStringID = "00"
-        let payloadFormatIndicatorStringValue = "01"
-        let payloadFormatIndicatorStringCharLength = "0\(payloadFormatIndicatorStringValue.count)"
-        let payloadFormatIndicatorString = "\(payloadFormatIndicatorStringID)\(payloadFormatIndicatorStringCharLength)\(payloadFormatIndicatorStringValue)"
-        
-        
-        //Point Of Initiation Method
-        let pointOfInitiationMethodStringID = "01"
-        //For The Value, 11 = Static, 12 = Dynamic
-        let pointOfInitiationMethodStringValue = "12"
-        let pointOfInitiationMethodStringCharLength = "0\(pointOfInitiationMethodStringValue.count)"
-        let pointOfInitiationMethodString = "\(pointOfInitiationMethodStringID)\(pointOfInitiationMethodStringCharLength)\(pointOfInitiationMethodStringValue)"
-        
-        
-        //Merchant Account Info Template Sub-Category : Electronic Fund Transfer Service
-        let electronicFundTransferServiceStringID = "00"
-        let electronicFundTransferServiceStringValue = "SG.PAYNOW"
-        let electronicFundTransferServiceStringCharLength = "0\(electronicFundTransferServiceStringValue.count)"
-        let electronicFundTransferServiceString = "\(electronicFundTransferServiceStringID)\(electronicFundTransferServiceStringCharLength)\(electronicFundTransferServiceStringValue)"
-        
-        //Merchant Account Info Template Sub-Category : UEN Category Selected
-        let categorySelectedStringID = "01"
-        //For The Value 0 = Mobile, 1 = Unused, 2 = UEN
-        let categorySelectedStringValue = "2"
-        let categorySelectedStringCharLength = "0\(categorySelectedStringValue.count)"
-        let categorySelectedString = "\(categorySelectedStringID)\(categorySelectedStringCharLength)\(categorySelectedStringValue)"
-        
-        //Merchant Account Info Template Sub-Category : UEN Value (Company Unique Entity Number)
-        let uenValueStringID = "02"
-        let uenValueStringValue = "\(UEN)"
-        var uenValueStringCharLength = ""
-        if uenValueStringValue.count >= 10 {
-            uenValueStringCharLength = "\(uenValueStringValue.count)"
-        } else if uenValueStringValue.count < 10 {
-            uenValueStringCharLength = "0\(uenValueStringValue.count)"
-        }
-        let uenValueString = "\(uenValueStringID)\(uenValueStringCharLength)\(uenValueStringValue)"
-        
-        //Merchant Account Info Template Sub-Category : Payment Is Or Is Not Editable
-        let isPaymentEditableStringID = "03"
-        //For The Value 0 = Payment Not Editable, 1 = Payment Is Editable
-        let isPaymentEditableStringValue = "0"
-        let isPaymentEditableStringCharLength = "0\(isPaymentEditableStringValue.count)"
-        let isPaymentEditableString = "\(isPaymentEditableStringID)\(isPaymentEditableStringCharLength)\(isPaymentEditableStringValue)"
-        
-        //Merchant Account Info Template Sub-Category : Expiry Date (YYYYDDMM Format)
-        let expiryDateStringID = "04"
-        let expiryDateStringValue = "\(expiryDate)"
-        let expiryDateStringCharLength = "0\(expiryDateStringValue.count)"
-        let expiryDateString = "\(expiryDateStringID)\(expiryDateStringCharLength)\(expiryDateStringValue)"
-        
-        //Merchant Account Info Template (ID-26)
-        let merchantAccountInfoTemplateStringID = "26"
-        let merchantAccountInfoTemplateStringCharLength = String(electronicFundTransferServiceString.count + categorySelectedString.count + uenValueString.count + isPaymentEditableString.count + expiryDateString.count)
-        let merchantAccountInfoTemplateString = "\(merchantAccountInfoTemplateStringID)\(merchantAccountInfoTemplateStringCharLength)\(electronicFundTransferServiceString)\(categorySelectedString)\(uenValueString)\(isPaymentEditableString)\(expiryDateString)"
-        
-        
-        //Merchant Category Code
-        let merchantCategoryCodeStringID = "52"
-        //The Value For The Merchant Category Code = 0000 If It Is Unused
-        let merchantCategoryCodeStringValue = "0000"
-        let merchantCategoryCodeStringCharLength = "0\(merchantCategoryCodeStringValue.count)"
-        let merchantCategoryCodeString = "\(merchantCategoryCodeStringID)\(merchantCategoryCodeStringCharLength)\(merchantCategoryCodeStringValue)"
-        
-        
-        //Currency Code
-        let currencyCodeStringID = "53"
-        //The Currency Code Of Singapore Is 702
-        let currencyCodeStringValue = "702"
-        let currencyCodeStringCharLength = "0\(currencyCodeStringValue.count)"
-        let currencyCodeString = "\(currencyCodeStringID)\(currencyCodeStringCharLength)\(currencyCodeStringValue)"
-        
-        
-        //The Transaction Amount In Dollars
-        let transactionAmountStringID = "54"
-        let transactionAmountStringValue = "\(transactionAmount)"
-        var transactionAmountStringCharLength = ""
-        if transactionAmountStringValue.count >= 10 {
-            transactionAmountStringCharLength = "\(transactionAmountStringValue.count)"
-        } else if transactionAmountStringValue.count < 10 {
-            transactionAmountStringCharLength = "0\(transactionAmountStringValue.count)"
-        }
-        let transactionAmountString = "\(transactionAmountStringID)\(transactionAmountStringCharLength)\(transactionAmountStringValue)"
-        
-        
-        //Country Code (2 Letters)
-        let countryCodeStringID = "58"
-        let countryCodeStringValue = "SG"
-        let countryCodeStringCharLength = "0\(countryCodeStringValue.count)"
-        let countryCodeString = "\(countryCodeStringID)\(countryCodeStringCharLength)\(countryCodeStringValue)"
-        
-        
-        //Company Name
-        let companyNameStringID = "59"
-        let companyNameStringValue = "\(companyName)"
-        var companyNameStringCharLength = ""
-        if companyNameStringValue.count >= 10 {
-            companyNameStringCharLength = "\(companyNameStringValue.count)"
-        } else if companyNameStringValue.count < 10 {
-            companyNameStringCharLength = "0\(companyNameStringValue.count)"
-        }
-        let companyNameString = "\(companyNameStringID)\(companyNameStringCharLength)\(companyNameStringValue)"
-        
-        
-        //Merchant City
-        let merchantCityStringID = "60"
-        let merchantCityStringValue = "Singapore"
-        var merchantCityStringCharLength = ""
-        if merchantCityStringValue.count >= 10 {
-            merchantCityStringCharLength = "\(merchantCityStringValue.count)"
-        } else if merchantCityStringValue.count < 10 {
-            merchantCityStringCharLength = "0\(merchantCityStringValue.count)"
-        }
-        let merchantCityString = "\(merchantCityStringID)\(merchantCityStringCharLength)\(merchantCityStringValue)"
-        
-        
-        //Additional Data Fields Sub-Category : Actual Bill / Reference Number
-        let referenceNumberStringID = "01"
-        let referenceNumberStringValue = "\(referenceNumber)"
-        var referenceNumberStringCharLength = ""
-        if referenceNumberStringValue.count >= 10 {
-            referenceNumberStringCharLength = "\(referenceNumberStringValue.count)"
-        } else if referenceNumberStringValue.count < 10 {
-            referenceNumberStringCharLength = "0\(referenceNumberStringValue.count)"
-        }
-        let referenceNumberString = "\(referenceNumberStringID)\(referenceNumberStringCharLength)\(referenceNumberStringValue)"
-        
-        //Additional Data Fields (ID 62)
-        let additionalDataFieldsStringID = "62"
-        let additionalDataFieldsStringCharLength = "\(referenceNumberString.count)"
-        let additionalDataFieldsString = "\(additionalDataFieldsStringID)\(additionalDataFieldsStringCharLength)\(referenceNumberString)"
-        
-        
-        //Checksum
-        let checksumStringID = "63"
-        let checksumStringCharLength = "04"
-        let checksumString = "\(checksumStringID)\(checksumStringCharLength)"
-        
-        
-        //PayNow QR Code String Without The CRC-16 Checksum
-        let payNowQRCodeStringWithoutChecksumCRC16 = "\(payloadFormatIndicatorString)\(pointOfInitiationMethodString)\(merchantAccountInfoTemplateString)\(merchantCategoryCodeString)\(currencyCodeString)\(transactionAmountString)\(countryCodeString)\(companyNameString)\(merchantCityString)\(additionalDataFieldsString)\(checksumString)"
-        
-        
-        //Calculating The CRC-16 / CCITT-FALSE Checksum
-        func crc16CCITT_False(data: [UInt8],seed: UInt16 = 0x1d0f, final: UInt16 = 0xffff) -> UInt16{
-            var crc = final
-            data.forEach { (byte) in
-                crc ^= UInt16(byte) << 8
-                (0..<8).forEach({ _ in
-                    if (crc & UInt16(0x8000)) != 0 {
-                        crc = (crc << 1) ^ 0x1021
-                    }
-                    else {
-                        crc = crc << 1
-                    }
-                    //crc = (crc & UInt16(0x8000)) != 0 ? (crc << 1) ^ 0x1021 : crc << 1
-                })
+        if makeTransactionAmountTextField?.text != Optional("") && makeReferenceNumberTextField?.text != Optional("") {
+            
+            
+            //Constats To Store The Transaction Amount As Well As The Reference Number
+            let transactionAmount = (makeTransactionAmountTextField?.text)!
+            let referenceNumber = (makeReferenceNumberTextField?.text)!
+            
+            
+            //Calculating The Formatted Date (YYYYMMDD) For Use In The Pay Now QR String If The Expiry Date Text Field Is Or Is Not Empty
+            if let unformattedDateString = makeExpiryDateTextField?.text {
+                
+                let unformattedDateFormatter = DateFormatter()
+                unformattedDateFormatter.dateFormat = "dd/MM/yyyy"
+                let unformattedDateButOfDateType = unformattedDateFormatter.date(from: unformattedDateString)
+                
+                let requiredDateFormat = DateFormatter()
+                requiredDateFormat.dateFormat = "yyyyMMdd"
+                
+                //The Constant Below Stores The Default Date Value Where The Value Is 100 Years From the Time 'Now' In Seconds
+                let defaultDateValueInSeconds = Date(timeIntervalSinceNow: 3155760000)
+                
+                //The Variable 'format_YYYY_DD_MM_Date' Has A Default Date Value Of 100 Years From 'Now' In Seconds
+                format_YYYY_DD_MM_Date = requiredDateFormat.string(from: unformattedDateButOfDateType ?? defaultDateValueInSeconds)
+                
+                //The Constant Below Stores The Default Date Value Of 100 Years From 'Now' In The Required YYYYMMDD Format For The Pay Now QR String
+                let defaultDateValueStringInRequiredDateFormat = requiredDateFormat.string(from: defaultDateValueInSeconds)
+                
+                //If The User Does Not Pick An Expiry Date, The Default Expiry Date Is Chosen Which is 100 Years From Now. The Line Below Converts The Date Variable To A String With A Value Of 100 Years From 'Now'
+                if format_YYYY_DD_MM_Date == defaultDateValueStringInRequiredDateFormat {
+                    format_YYYY_DD_MM_Date = defaultDateValueStringInRequiredDateFormat
+                }
+                
             }
-            //return UInt16(crc ^ final)
-            return UInt16(crc & final)
+            
+            if makeTransactionAmountTextField?.text == Optional("") {
+                print("Hi")
+            }
+            
+            //Fetches The Final Pay Now QR Code String From The 'PayNowQRString' Model
+            let payNowQRString = PayNowQRString(inputUEN: "201101550Z", inputExpiryDate: "\(format_YYYY_DD_MM_Date!)", inputTransactionAmount: "\(transactionAmount)", inputCompanyName: "Qryptal", inputReferenceNumber: "\(referenceNumber)")
+            let finalPayNowQRString = payNowQRString.getFinalPayNowQRString()
+            print(finalPayNowQRString)
+            
+            //Creates A Placeholder Image View To Send To The Generate QR Code Function
+            let imageViewToHouseQRCode = UIImageView()
+            imageViewToHouseQRCode.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: CGFloat( (334 / 414) * screenWidth), height: CGFloat( (334 / 896) * screenHeight))
+            imageViewToHouseQRCode.backgroundColor = .systemRed
+            
+            //Calls The Generate QR Code Function To Generate The Actual QR Code And Stores The QR Code Image In The Specified Constant
+            let qrCodeImage = generateQRCode(from: "\(finalPayNowQRString)", with: imageViewToHouseQRCode)
+            
+            //Creates The Actual Image View To Which The Generated QR Code Is Added To
+            let actualImageView = UIImageView(image: qrCodeImage)
+            actualImageView.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: CGFloat( (334 / 414) * screenWidth), height: CGFloat( (334 / 896) * screenHeight))
+            // NOTE : The Width And Height Specified Above Should Be Equal So That The QR Code Is A Square
+            view.addSubview(actualImageView)
+            
+               
+        } else  {
+            
+            cannotGenerateQRWithoutInputAlert()
+            
         }
         
-        let array: [UInt8] = Array(payNowQRCodeStringWithoutChecksumCRC16.utf8)
-
-        let ocrc = crc16CCITT_False(data: array)
-        let lowercase_Checksum_CRC16_String = String(ocrc, radix: 16)
-        let checksum_CRC16_String = lowercase_Checksum_CRC16_String.uppercased()
         
-        
-        //Final Pay Now QR Code String With Checksum
-        let finalPayNowQRString = "\(payNowQRCodeStringWithoutChecksumCRC16)\(checksum_CRC16_String)"
-        
-        
-        
-        
-        //Creates A Placeholder Image View To Send To The Generate QR Code Function
-        let imageViewToHouseQRCode = UIImageView()
-        imageViewToHouseQRCode.frame = CGRect(x: 40, y: 300, width: 334, height: 334)
-        imageViewToHouseQRCode.backgroundColor = .systemRed
-        
-        //Calls The Generate QR Code Function And Stores The QR Code Image In The Specified Constant
-        let qrCodeImage = generateQRCode(from: "\(finalPayNowQRString)", with: imageViewToHouseQRCode)
-        
-        //Creates The Actual Image View To Which The Generated QR Code Is Added To
-        let actualImageView = UIImageView(image: qrCodeImage)
-        actualImageView.frame = CGRect(x: 40, y: 300, width: 334, height: 334)
-        view.addSubview(actualImageView)
         
     }
     
@@ -264,6 +343,7 @@ class GenerateViewController: UIViewController {
             let scaleY = imageView.frame.size.height / qrImage.extent.size.height
             let transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
 
+            
             if let output = filter.outputImage?.transformed(by: transform) {
                 return UIImage(ciImage: output)
             }
@@ -272,6 +352,39 @@ class GenerateViewController: UIViewController {
         
     }
     
+    
+    //Function Which Presents An Alert When Called
+    func cannotGenerateQRWithoutInputAlert() {
+        
+        let ac = UIAlertController(title: "Cannot Generate QR Code", message: "Please Make Sure That The Amount ($) And The Reference Number Field Is Filled In", preferredStyle: .alert)
+        
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
+        
+        //Removes The Alert Automatically After A Deadline Of 15 Seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            ac.dismiss(animated: true, completion: nil)
+            self.viewWillAppear(true)
+        }
+        
+    }
+    
 
+}
+
+
+
+//The Extension Which Allows The User To Click The Return Key On Their Keyboard To End Editing On The Text Fields
+
+extension GenerateViewController : UITextFieldDelegate {
+    
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        makeTransactionAmountTextField?.endEditing(true)
+        makeReferenceNumberTextField?.endEditing(true)
+        makeExpiryDateTextField?.endEditing(true)
+        return true
+    }
+    
 }
 
