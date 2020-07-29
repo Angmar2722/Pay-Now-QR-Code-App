@@ -26,6 +26,7 @@ class GenerateViewController: UIViewController {
     var format_YYYY_DD_MM_Date : String?
 
     var makeQRCodeButton : UIButton?
+    var actualImageView : UIImageView?
     
     
     
@@ -88,8 +89,18 @@ class GenerateViewController: UIViewController {
         if makeTransactionAmountTextField?.isEditing == true &&  makeTransactionAmountTextField?.text != Optional("") {
             
             if let amount = Double((makeTransactionAmountTextField?.text)!) {
-                makeTransactionAmountTextField?.text = String(format: "%.2f", arguments: [amount])
-                view.endEditing(true)
+                
+                //Since The Maximum Number Of Characters Allowed Under The Pay Now QR Code Format Is 13, The Lines Below Prevents the User From Inputting An Integer With 11-13 Characters And Then A .00 Is Added Which Gives 16 Characters Which is More Than The Maximum
+                //The line below contains the number 1000000000000 which has 11 digits
+                if amount < 10000000000 {
+                    makeTransactionAmountTextField?.text = String(format: "%.2f", arguments: [amount])
+                    view.endEditing(true)
+                } else {
+                    cannotExceedTransactionAmountCharacterLimit()
+                    view.endEditing(false)
+                }
+                
+                
             } else {
                 amountHasToBeANumber()
                 view.endEditing(false)
@@ -343,10 +354,10 @@ class GenerateViewController: UIViewController {
             let qrCodeImage = generateQRCode(from: "\(finalPayNowQRString)", with: imageViewToHouseQRCode)
             
             //Creates The Actual Image View To Which The Generated QR Code Is Added To
-            let actualImageView = UIImageView(image: qrCodeImage)
-            actualImageView.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode, height: widthAndHeightOfQRCode)
+            actualImageView = UIImageView(image: qrCodeImage)
+            actualImageView!.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode, height: widthAndHeightOfQRCode)
             // NOTE : The Width And Height Specified Above Should Be Equal So That The QR Code Is A Square
-            view.addSubview(actualImageView)
+            view.addSubview(actualImageView!)
             
                
         } else  {
@@ -400,10 +411,26 @@ class GenerateViewController: UIViewController {
     }
     
     
-    //Alert Which Is Called When The User Has Exceeded the Character Limit
-    func cannotExceedCharacterLimit() {
+    //Alert Which Is Called When The User Has Exceeded The Reference Number Character Limit
+    func cannotExceedRefNoCharacterLimit() {
         
-        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters", preferredStyle: .alert)
+        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number allowed is 30", preferredStyle: .alert)
+        
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
+        
+        //Removes The Alert Automatically After A Deadline Of 10 Seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            ac.dismiss(animated: true, completion: nil)
+            self.viewWillAppear(true)
+        }
+        
+    }
+    
+    //Alert Which Is Called When The User Has Exceeded The Transaction Amount Character Limit
+    func cannotExceedTransactionAmountCharacterLimit() {
+        
+        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number of characters allowed is 13 including the decimal point.", preferredStyle: .alert)
         
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
@@ -417,7 +444,7 @@ class GenerateViewController: UIViewController {
     }
     
     
-    //Alert Which is Called When The Transaction Amount Entered Is Not A Number
+    //Alert Which Is Called When The Transaction Amount Entered Is Not A Number
     func amountHasToBeANumber() {
         
         let ac = UIAlertController(title: "Amount Entered Is Not A Number", message: "The Transaction Amount Has To Be A Number Like 99.99 or 99", preferredStyle: .alert)
@@ -432,6 +459,54 @@ class GenerateViewController: UIViewController {
         }
         
     }
+    
+    
+    //Alert Which Is Called When The QR Code Image Is Successfully Copied
+    func successfullyCopied() {
+        
+        let ac = UIAlertController(title: "QR Code Successfully Copied!", message: "", preferredStyle: .alert)
+        
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
+        
+        //Removes The Alert Automatically After A Deadline Of 10 Seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            ac.dismiss(animated: true, completion: nil)
+            self.viewWillAppear(true)
+        }
+        
+    }
+    
+    
+    
+    @IBAction func resetPressed(_ sender: UIBarButtonItem) {
+        makeTransactionAmountTextField?.text = ""
+        makeReferenceNumberTextField?.text = ""
+        makeExpiryDateTextField?.text = ""
+        self.actualImageView?.removeFromSuperview()
+    }
+    
+    
+    @IBAction func refreshIconPressed(_ sender: UIBarButtonItem) {
+        makeTransactionAmountTextField?.text = ""
+        makeReferenceNumberTextField?.text = ""
+        makeExpiryDateTextField?.text = ""
+        self.actualImageView?.removeFromSuperview()
+    }
+    
+    
+    @IBAction func copyPressed(_ sender: UIBarButtonItem) {
+        UIPasteboard.general.image = actualImageView?.image
+        successfullyCopied()
+    }
+    
+    
+    @IBAction func shareIconPressed(_ sender: UIBarButtonItem) {
+        let arrayOfImagesToShare = [actualImageView?.image]
+        let ac = UIActivityViewController(activityItems: arrayOfImagesToShare as [Any], applicationActivities: nil)
+        present(ac, animated: true)
+    }
+    
     
 
 }
@@ -498,7 +573,7 @@ extension GenerateViewController : UITextFieldDelegate {
 
                 if currentTransactionAmountText.count > 13 {
 
-                    cannotExceedCharacterLimit()
+                    cannotExceedTransactionAmountCharacterLimit()
                     return false
 
                 }
@@ -511,8 +586,8 @@ extension GenerateViewController : UITextFieldDelegate {
 
                 let currentReferenceNumberText = referenceNumberText + string
 
-                if currentReferenceNumberText.count > 20 {
-                    cannotExceedCharacterLimit()
+                if currentReferenceNumberText.count > 30 {
+                    cannotExceedRefNoCharacterLimit()
                     return false
                 }
 
@@ -524,6 +599,23 @@ extension GenerateViewController : UITextFieldDelegate {
 
         return true
 
+    }
+   
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        
+        //The Line Below Makes Sure That 2 Decimal Places Are Added In The Transaction Amount Tax Field Even If The User Taps On Another Text Field To Exit The Transaction Text Field And Select The Other Text Field
+        if let amount = Double((makeTransactionAmountTextField?.text)!) {
+                if amount < 10000000000 {
+                    makeTransactionAmountTextField?.text = String(format: "%.2f", arguments: [amount])
+                }
+        }
+      
+        
+    }
+    
+    //Removes The QR Code Image When The User Begins Editing On A Text Field
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        self.actualImageView?.removeFromSuperview()
     }
     
     

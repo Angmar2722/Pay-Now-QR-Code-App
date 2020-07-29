@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
@@ -35,12 +35,28 @@
                     </view>
                     <navigationItem key="navigationItem" id="zyo-Zk-eRa">
                         <leftBarButtonItems>
-                            <barButtonItem title="Reset" id="Cze-db-ZoJ"/>
-                            <barButtonItem title="Refresh" image="arrow.clockwise" catalog="system" id="Vre-oV-OXd"/>
+                            <barButtonItem title="Reset" id="Cze-db-ZoJ">
+                                <connections>
+                                    <action selector="resetPressed:" destination="8rJ-Kc-sve" id="Nch-fK-iRq"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Refresh" image="arrow.clockwise" catalog="system" id="Vre-oV-OXd">
+                                <connections>
+                                    <action selector="refreshIconPressed:" destination="8rJ-Kc-sve" id="B5O-IK-oVK"/>
+                                </connections>
+                            </barButtonItem>
                         </leftBarButtonItems>
                         <rightBarButtonItems>
-                            <barButtonItem title="Share" id="NHs-bT-pIn"/>
-                            <barButtonItem title="Copy" id="xP5-hs-IIq"/>
+                            <barButtonItem title="Share" image="square.and.arrow.up" catalog="system" id="NHs-bT-pIn">
+                                <connections>
+                                    <action selector="shareIconPressed:" destination="8rJ-Kc-sve" id="T12-QW-T0I"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Copy" id="xP5-hs-IIq">
+                                <connections>
+                                    <action selector="copyPressed:" destination="8rJ-Kc-sve" id="lZi-0X-i0n"/>
+                                </connections>
+                            </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
                 </viewController>
@@ -108,5 +124,6 @@
         <image name="book" catalog="system" width="128" height="101"/>
         <image name="qrcode" catalog="system" width="128" height="114"/>
         <image name="rays" catalog="system" width="128" height="122"/>
+        <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
     </resources>
 </document>
