@@ -88,7 +88,7 @@ struct PayNowQRString {
         } else if uenValueStringValue.count < 10 {
             return "0\(uenValueStringValue.count)"
         } else {
-            return String("Failed To Return UEN")
+            return String("Failed To Return UEN Character Length")
         }
         
     }
@@ -165,7 +165,7 @@ struct PayNowQRString {
         } else if transactionAmountStringValue.count < 10 {
             return "0\(transactionAmountStringValue.count)"
         } else {
-            return String("Failed To Return Transaction Amount")
+            return String("Failed To Return Transaction Amount Character Length")
         }
         
     }
@@ -197,7 +197,7 @@ struct PayNowQRString {
         } else if companyNameStringValue.count < 10 {
             return "0\(companyNameStringValue.count)"
         } else {
-            return String("Failed To Return Company Name")
+            return String("Failed To Return Company Name Character Length")
         }
         
     }
@@ -216,7 +216,7 @@ struct PayNowQRString {
         } else if merchantCityStringValue.count < 10 {
             return "0\(merchantCityStringValue.count)"
         } else {
-            return String("Failed To Return Merchant City")
+            return String("Failed To Return Merchant City Character Length")
         }
         
     }
@@ -237,7 +237,7 @@ struct PayNowQRString {
         } else if referenceNumberStringValue.count < 10 {
              return "0\(referenceNumberStringValue.count)"
         } else {
-            return String("Failed To Return Reference Number")
+            return String("Failed To Return Reference Number String Character Length")
         }
         
     }
@@ -248,7 +248,15 @@ struct PayNowQRString {
     //Additional Data Fields (ID 62)
     let additionalDataFieldsStringID = "62"
     var additionalDataFieldsStringCharLength : String {
-        return "\(referenceNumberString.count)"
+        
+        if referenceNumberString.count >= 10 {
+             return "\(referenceNumberString.count)"
+        } else if referenceNumberString.count < 10 {
+             return "0\(referenceNumberString.count)"
+        } else {
+            return String("Failed To Return Additional Data Fields Character Length")
+        }
+        
     }
     var additionalDataFieldsString : String {
         return "\(additionalDataFieldsStringID)\(additionalDataFieldsStringCharLength)\(referenceNumberString)"

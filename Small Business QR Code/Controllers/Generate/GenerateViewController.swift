@@ -14,6 +14,7 @@ class GenerateViewController: UIViewController {
     //Dimensions of Device Screen
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
+    let screenArea = UIScreen.main.bounds.width * UIScreen.main.bounds.height
     
     
     //Initializing Screen UI Components
@@ -71,16 +72,34 @@ class GenerateViewController: UIViewController {
         makeExpiryDateTextField?.inputView = expiryDateDatePicker
 
         
-        //Adds the Tap Gesture Where The User Can Tap Elsewhere On The Screen When The Date Picker Is Selected To De-Select The Date Picker
+        //Adds the Tap Gesture Where The User Can Tap Elsewhere On The Screen To Dismiss The Editor (Such As A Keyboard Or A Date Picker)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(GenerateViewController.viewTapped(gestureRecognizer:)))
         view.addGestureRecognizer(tapGesture)
         
         
     }
     
-    //When The User Taps On The Specified Selector, The Editing Is Dismissed (In This Instance, The Editing Is For The Date Picker)
+    
+    
+    //When The User Taps On The Screen, The Editor (Such As A Keyboard Or A Date Picker) Is Dismissed
     @objc func viewTapped(gestureRecognizer : UITapGestureRecognizer) {
-        view.endEditing(true)
+    
+        //The If Statement Below Checks If The Text Entered In The Transaction Amount Text Field Is A Number And If It Is, It Automatically Adds 2 Decimal Places To The Number, Even If It Is An Integer Or Has 1 Decimal Place. If It Is Not A Number, The Keyboard Is Not Dismissed And The User Is Prompted To Enter A Number
+        if makeTransactionAmountTextField?.isEditing == true &&  makeTransactionAmountTextField?.text != Optional("") {
+            
+            if let amount = Double((makeTransactionAmountTextField?.text)!) {
+                makeTransactionAmountTextField?.text = String(format: "%.2f", arguments: [amount])
+                view.endEditing(true)
+            } else {
+                amountHasToBeANumber()
+                view.endEditing(false)
+            }
+
+        } else {
+            //The Line Below Dismisses Editing For All Other Instances Excluding The Transaction Amount Text Field (So For The Expiry Date Or Reference Number Text Field etc.)
+            view.endEditing(true)
+        }
+        
     }
     
     
@@ -175,6 +194,8 @@ class GenerateViewController: UIViewController {
         transactionAmountTextField.layer.borderWidth = 2
         transactionAmountTextField.backgroundColor = UIColor.white
         
+        //Keyboard Which When Toggled Only Shows Numbers And A Decimal Point
+        transactionAmountTextField.keyboardType = .decimalPad
         
         return transactionAmountTextField
         
@@ -242,7 +263,7 @@ class GenerateViewController: UIViewController {
         
         //Button Frame Attributes
         makeQRCodeButton.layer.cornerRadius = CGFloat( (25 / 896) * screenHeight)
-        print("The Make QR Code Button Corner Radius For This Phone Is \(makeQRCodeButton.layer.cornerRadius) For iPhone 11 It Is 25.0")
+
         
         makeQRCodeButton.backgroundColor = .systemBlue
         
@@ -300,13 +321,22 @@ class GenerateViewController: UIViewController {
             }
             
             //Fetches The Final Pay Now QR Code String From The 'PayNowQRString' Model
-            let payNowQRString = PayNowQRString(inputUEN: "201101550Z", inputExpiryDate: "\(format_YYYY_DD_MM_Date!)", inputTransactionAmount: "\(transactionAmount)", inputCompanyName: "Qryptal", inputReferenceNumber: "\(referenceNumber)")
+            let payNowQRString = PayNowQRString(inputUEN: "53222036J", inputExpiryDate: "\(format_YYYY_DD_MM_Date!)", inputTransactionAmount: "\(transactionAmount)", inputCompanyName: "Bud Of Joy", inputReferenceNumber: "\(referenceNumber)")
             let finalPayNowQRString = payNowQRString.getFinalPayNowQRString()
-            print(finalPayNowQRString)
+            
+            
+            //Calculating The Width And Height Of The Image View To House The QR Code
+            let safeAreaFrame = self.view.safeAreaLayoutGuide.layoutFrame
+            let safeAreaHeight = safeAreaFrame.height
+            let screenAreaFactoringInSafeAreaHeight = (safeAreaHeight * screenWidth)
+            let screenAreaPercenageOccupiedByQRCode = ( CGFloat(334 * 334) / CGFloat(725 * 414) ) * 100
+            let screenAreaOfQRCode = ( screenAreaPercenageOccupiedByQRCode / 100 ) * screenAreaFactoringInSafeAreaHeight
+            let widthAndHeightOfQRCode = screenAreaOfQRCode.squareRoot()
+
             
             //Creates A Placeholder Image View To Send To The Generate QR Code Function
             let imageViewToHouseQRCode = UIImageView()
-            imageViewToHouseQRCode.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: CGFloat( (334 / 414) * screenWidth), height: CGFloat( (334 / 896) * screenHeight))
+            imageViewToHouseQRCode.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode, height: widthAndHeightOfQRCode)
             imageViewToHouseQRCode.backgroundColor = .systemRed
             
             //Calls The Generate QR Code Function To Generate The Actual QR Code And Stores The QR Code Image In The Specified Constant
@@ -314,7 +344,7 @@ class GenerateViewController: UIViewController {
             
             //Creates The Actual Image View To Which The Generated QR Code Is Added To
             let actualImageView = UIImageView(image: qrCodeImage)
-            actualImageView.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: CGFloat( (334 / 414) * screenWidth), height: CGFloat( (334 / 896) * screenHeight))
+            actualImageView.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode, height: widthAndHeightOfQRCode)
             // NOTE : The Width And Height Specified Above Should Be Equal So That The QR Code Is A Square
             view.addSubview(actualImageView)
             
@@ -362,6 +392,40 @@ class GenerateViewController: UIViewController {
         present(ac, animated: true)
         
         //Removes The Alert Automatically After A Deadline Of 15 Seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
+            ac.dismiss(animated: true, completion: nil)
+            self.viewWillAppear(true)
+        }
+        
+    }
+    
+    
+    //Alert Which Is Called When The User Has Exceeded the Character Limit
+    func cannotExceedCharacterLimit() {
+        
+        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters", preferredStyle: .alert)
+        
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
+        
+        //Removes The Alert Automatically After A Deadline Of 10 Seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            ac.dismiss(animated: true, completion: nil)
+            self.viewWillAppear(true)
+        }
+        
+    }
+    
+    
+    //Alert Which is Called When The Transaction Amount Entered Is Not A Number
+    func amountHasToBeANumber() {
+        
+        let ac = UIAlertController(title: "Amount Entered Is Not A Number", message: "The Transaction Amount Has To Be A Number Like 99.99 or 99", preferredStyle: .alert)
+        
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
+        
+        //Removes The Alert Automatically After A Deadline Of 10 Seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
             ac.dismiss(animated: true, completion: nil)
             self.viewWillAppear(true)
@@ -374,11 +438,11 @@ class GenerateViewController: UIViewController {
 
 
 
-//The Extension Which Allows The User To Click The Return Key On Their Keyboard To End Editing On The Text Fields
 
 extension GenerateViewController : UITextFieldDelegate {
     
     
+    //Function Which Removes The Cursor & Keyboard When The User Presses Return
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         makeTransactionAmountTextField?.endEditing(true)
         makeReferenceNumberTextField?.endEditing(true)
@@ -386,5 +450,82 @@ extension GenerateViewController : UITextFieldDelegate {
         return true
     }
     
-}
+    
+    //Function Which Stops The User From :
+    // 1. Adding More Characters If They Exceed The Character Limit In The Text Field. An Alert Is Also Called To Prompt The User
+    // 2. Entering More Than 2 Digits After The Decimal Point
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        
+        
+        let text: NSString = textField.text! as NSString
+        let resultString = text.replacingCharacters(in: range, with: string)
 
+
+        //Check the specific textField
+        if textField == makeTransactionAmountTextField {
+            
+            let textArray = resultString.components(separatedBy: ".")
+            
+            //Allow Only One "." (Decimal Point)
+            if textArray.count > 2 {
+                
+                return false
+                
+            }
+            
+           if textArray.count == 2 {
+            
+                let lastString = textArray.last
+                
+                //Prevents The User From Exceeding 2 Digits After The Decimal Point
+                if lastString!.count > 2 {
+                   
+                    return false
+                    
+                }
+            
+            }
+            
+        }
+
+        switch textField {
+
+        case makeTransactionAmountTextField:
+
+            if let transactionAmountText = makeTransactionAmountTextField?.text {
+
+                let currentTransactionAmountText = transactionAmountText + string
+
+                if currentTransactionAmountText.count > 13 {
+
+                    cannotExceedCharacterLimit()
+                    return false
+
+                }
+
+            }
+
+        case makeReferenceNumberTextField:
+
+            if let referenceNumberText = makeReferenceNumberTextField?.text {
+
+                let currentReferenceNumberText = referenceNumberText + string
+
+                if currentReferenceNumberText.count > 20 {
+                    cannotExceedCharacterLimit()
+                    return false
+                }
+
+            }
+
+        default:
+            print("Anshul, Add A Better Default For This Switch Statement!")
+        }
+
+        return true
+
+    }
+    
+    
+    
+}
