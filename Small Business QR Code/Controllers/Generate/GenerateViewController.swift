@@ -11,6 +11,9 @@ import UIKit
 class GenerateViewController: UIViewController {
     
     
+    //Initializing Other View Controller Objects
+    var settingsViewController : SettingsViewController?
+    
     //Dimensions of Device Screen
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
@@ -292,83 +295,96 @@ class GenerateViewController: UIViewController {
         view.endEditing(true)
         
         
+        //Fetches The Company Name & UEN From The Settings View Controller
+        let companyNameString = UserDefaults.standard.string(forKey: "Company_Name_Text")
+        let uenString = UserDefaults.standard.string(forKey: "UEN_Text")
         
-        if makeTransactionAmountTextField?.text != Optional("") && makeReferenceNumberTextField?.text != Optional("") {
+        
+        if companyNameString != Optional("") && uenString != Optional("") {
             
-            
-            //Constats To Store The Transaction Amount As Well As The Reference Number
-            let transactionAmount = (makeTransactionAmountTextField?.text)!
-            let referenceNumber = (makeReferenceNumberTextField?.text)!
-            
-            
-            //Calculating The Formatted Date (YYYYMMDD) For Use In The Pay Now QR String If The Expiry Date Text Field Is Or Is Not Empty
-            if let unformattedDateString = makeExpiryDateTextField?.text {
+            if makeTransactionAmountTextField?.text != Optional("") && makeReferenceNumberTextField?.text != Optional("") {
                 
-                let unformattedDateFormatter = DateFormatter()
-                unformattedDateFormatter.dateFormat = "dd/MM/yyyy"
-                let unformattedDateButOfDateType = unformattedDateFormatter.date(from: unformattedDateString)
                 
-                let requiredDateFormat = DateFormatter()
-                requiredDateFormat.dateFormat = "yyyyMMdd"
+                //Constats To Store The Transaction Amount As Well As The Reference Number
+                let transactionAmount = (makeTransactionAmountTextField?.text)!
+                let referenceNumber = (makeReferenceNumberTextField?.text)!
                 
-                //The Constant Below Stores The Default Date Value Where The Value Is 100 Years From the Time 'Now' In Seconds
-                let defaultDateValueInSeconds = Date(timeIntervalSinceNow: 3155760000)
                 
-                //The Variable 'format_YYYY_DD_MM_Date' Has A Default Date Value Of 100 Years From 'Now' In Seconds
-                format_YYYY_DD_MM_Date = requiredDateFormat.string(from: unformattedDateButOfDateType ?? defaultDateValueInSeconds)
-                
-                //The Constant Below Stores The Default Date Value Of 100 Years From 'Now' In The Required YYYYMMDD Format For The Pay Now QR String
-                let defaultDateValueStringInRequiredDateFormat = requiredDateFormat.string(from: defaultDateValueInSeconds)
-                
-                //If The User Does Not Pick An Expiry Date, The Default Expiry Date Is Chosen Which is 100 Years From Now. The Line Below Converts The Date Variable To A String With A Value Of 100 Years From 'Now'
-                if format_YYYY_DD_MM_Date == defaultDateValueStringInRequiredDateFormat {
-                    format_YYYY_DD_MM_Date = defaultDateValueStringInRequiredDateFormat
+                //Calculating The Formatted Date (YYYYMMDD) For Use In The Pay Now QR String If The Expiry Date Text Field Is Or Is Not Empty
+                if let unformattedDateString = makeExpiryDateTextField?.text {
+                    
+                    let unformattedDateFormatter = DateFormatter()
+                    unformattedDateFormatter.dateFormat = "dd/MM/yyyy"
+                    let unformattedDateButOfDateType = unformattedDateFormatter.date(from: unformattedDateString)
+                    
+                    let requiredDateFormat = DateFormatter()
+                    requiredDateFormat.dateFormat = "yyyyMMdd"
+                    
+                    //The Constant Below Stores The Default Date Value Where The Value Is 100 Years From the Time 'Now' In Seconds
+                    let defaultDateValueInSeconds = Date(timeIntervalSinceNow: 3155760000)
+                    
+                    //The Variable 'format_YYYY_DD_MM_Date' Has A Default Date Value Of 100 Years From 'Now' In Seconds
+                    format_YYYY_DD_MM_Date = requiredDateFormat.string(from: unformattedDateButOfDateType ?? defaultDateValueInSeconds)
+                    
+                    //The Constant Below Stores The Default Date Value Of 100 Years From 'Now' In The Required YYYYMMDD Format For The Pay Now QR String
+                    let defaultDateValueStringInRequiredDateFormat = requiredDateFormat.string(from: defaultDateValueInSeconds)
+                    
+                    //If The User Does Not Pick An Expiry Date, The Default Expiry Date Is Chosen Which is 100 Years From Now. The Line Below Converts The Date Variable To A String With A Value Of 100 Years From 'Now'
+                    if format_YYYY_DD_MM_Date == defaultDateValueStringInRequiredDateFormat {
+                        format_YYYY_DD_MM_Date = defaultDateValueStringInRequiredDateFormat
+                    }
+                    
                 }
                 
-            }
-            
-            if makeTransactionAmountTextField?.text == Optional("") {
-                print("Hi")
-            }
-            
-            //Fetches The Final Pay Now QR Code String From The 'PayNowQRString' Model
-            let payNowQRString = PayNowQRString(inputUEN: "53222036J", inputExpiryDate: "\(format_YYYY_DD_MM_Date!)", inputTransactionAmount: "\(transactionAmount)", inputCompanyName: "Bud Of Joy", inputReferenceNumber: "\(referenceNumber)")
-            let finalPayNowQRString = payNowQRString.getFinalPayNowQRString()
-            
-            
-            //Calculating The Width And Height Of The Image View To House The QR Code
-            let safeAreaFrame = self.view.safeAreaLayoutGuide.layoutFrame
-            let safeAreaHeight = safeAreaFrame.height
-            let screenAreaFactoringInSafeAreaHeight = (safeAreaHeight * screenWidth)
-            let screenAreaPercenageOccupiedByQRCode = ( CGFloat(334 * 334) / CGFloat(725 * 414) ) * 100
-            let screenAreaOfQRCode = ( screenAreaPercenageOccupiedByQRCode / 100 ) * screenAreaFactoringInSafeAreaHeight
-            let widthAndHeightOfQRCode = screenAreaOfQRCode.squareRoot()
+                
+                //For Testing Purposes : Qryptal UEN Is 201101550Z
+                //Fetches The Final Unwrapped Company Name & UEN String
+                let finalCompanyNameString = (companyNameString)!
+                let finalUENString = (uenString)!
+                //Fetches The Final Pay Now QR Code String From The 'PayNowQRString' Model
+                let payNowQRString = PayNowQRString(inputUEN: "\(finalUENString)", inputExpiryDate: "\(format_YYYY_DD_MM_Date!)", inputTransactionAmount: "\(transactionAmount)", inputCompanyName: "\(finalCompanyNameString)", inputReferenceNumber: "\(referenceNumber)")
+                let finalPayNowQRString = payNowQRString.getFinalPayNowQRString()
+                
+                
+                //Calculating The Width And Height Of The Image View To House The QR Code
+                let safeAreaFrame = self.view.safeAreaLayoutGuide.layoutFrame
+                let safeAreaHeight = safeAreaFrame.height
+                let screenAreaFactoringInSafeAreaHeight = (safeAreaHeight * screenWidth)
+                let screenAreaPercenageOccupiedByQRCode = ( CGFloat(334 * 334) / CGFloat(725 * 414) ) * 100
+                let screenAreaOfQRCode = ( screenAreaPercenageOccupiedByQRCode / 100 ) * screenAreaFactoringInSafeAreaHeight
+                let widthAndHeightOfQRCode = screenAreaOfQRCode.squareRoot()
 
+                
+                //Creates A Placeholder Image View To Send To The Generate QR Code Function
+                let imageViewToHouseQRCode = UIImageView()
+                imageViewToHouseQRCode.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode, height: widthAndHeightOfQRCode)
+                imageViewToHouseQRCode.backgroundColor = .systemRed
+                
+                //Calls The Generate QR Code Function To Generate The Actual QR Code And Stores The QR Code Image In The Specified Constant
+                let qrCodeImage = generateQRCode(from: "\(finalPayNowQRString)", with: imageViewToHouseQRCode)
+                
+                //Creates The Actual Image View To Which The Generated QR Code Is Added To
+                actualImageView = UIImageView(image: qrCodeImage)
+                actualImageView!.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode, height: widthAndHeightOfQRCode)
+                // NOTE : The Width And Height Specified Above Should Be Equal So That The QR Code Is A Square
+                view.addSubview(actualImageView!)
+                
+                   
+            } else  {
+                
+                cannotGenerateQRWithoutInputAlert()
+                
+            }
             
-            //Creates A Placeholder Image View To Send To The Generate QR Code Function
-            let imageViewToHouseQRCode = UIImageView()
-            imageViewToHouseQRCode.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode, height: widthAndHeightOfQRCode)
-            imageViewToHouseQRCode.backgroundColor = .systemRed
+        } else {
             
-            //Calls The Generate QR Code Function To Generate The Actual QR Code And Stores The QR Code Image In The Specified Constant
-            let qrCodeImage = generateQRCode(from: "\(finalPayNowQRString)", with: imageViewToHouseQRCode)
-            
-            //Creates The Actual Image View To Which The Generated QR Code Is Added To
-            actualImageView = UIImageView(image: qrCodeImage)
-            actualImageView!.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode, height: widthAndHeightOfQRCode)
-            // NOTE : The Width And Height Specified Above Should Be Equal So That The QR Code Is A Square
-            view.addSubview(actualImageView!)
-            
-               
-        } else  {
-            
-            cannotGenerateQRWithoutInputAlert()
+            didNotInputUENOrCompanyName()
             
         }
         
         
-        
     }
+    
     
     
     //Function Which Generates The QR Code
@@ -403,7 +419,25 @@ class GenerateViewController: UIViewController {
     }
     
     
-    //Function Which Presents An Alert When Called
+    
+    //Alert Which Is Called When The User Tries To Generate A QR Code Without Filling In The UEN & Company Name In The Settings Page
+    func didNotInputUENOrCompanyName() {
+        
+        let ac = UIAlertController(title: "Cannot Generate QR Code", message: "Please Make Sure Than You Have Filled In Your Company Name And Its UEN In The Settings Page", preferredStyle: .alert)
+        
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
+        
+        //Removes The Alert Automatically After A Deadline Of 10 Seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
+            ac.dismiss(animated: true, completion: nil)
+            self.viewWillAppear(true)
+        }
+        
+    }
+    
+    
+    //Function Which Presents An Alert When Called. This Alert Is Called When The Transaction Amount Text Field And/Or The Reference Number Text Field Were Not Filled
     func cannotGenerateQRWithoutInputAlert() {
         
         let ac = UIAlertController(title: "Cannot Generate QR Code", message: "Please Make Sure That The Amount ($) And The Reference Number Field Is Filled In", preferredStyle: .alert)
@@ -412,18 +446,17 @@ class GenerateViewController: UIViewController {
         present(ac, animated: true)
         
         //Removes The Alert Automatically After A Deadline Of 15 Seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
             ac.dismiss(animated: true, completion: nil)
             self.viewWillAppear(true)
         }
         
     }
     
-    
-    //Alert Which Is Called When The User Has Exceeded The Reference Number Character Limit
-    func cannotExceedRefNoCharacterLimit() {
+    //Alert Which Is Called When The User Has Exceeded The Transaction Amount Character Limit
+    func cannotExceedTransactionAmountCharacterLimit() {
         
-        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number allowed is 30", preferredStyle: .alert)
+        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number of characters allowed is 13 including the decimal point.", preferredStyle: .alert)
         
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
@@ -436,10 +469,10 @@ class GenerateViewController: UIViewController {
         
     }
     
-    //Alert Which Is Called When The User Has Exceeded The Transaction Amount Character Limit
-    func cannotExceedTransactionAmountCharacterLimit() {
+    //Alert Which Is Called When The User Has Exceeded The Reference Number Character Limit
+    func cannotExceedRefNoCharacterLimit() {
         
-        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number of characters allowed is 13 including the decimal point.", preferredStyle: .alert)
+        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number allowed is 30", preferredStyle: .alert)
         
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)

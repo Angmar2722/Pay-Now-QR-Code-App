@@ -13,8 +13,8 @@ class TabBarViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        //The Line Below Shows The Default Screen When The App Is Launched (Settings Screen has an index value of 0, Generate Screen has an index value of 1 and History Screen has an index value of 2)
-        self.selectedIndex = 0
+        //The Line Below Shows The Default Screen When The App Is Launched (Settings Screen Has An index value of 0, Generate Screen Has An Index Value Of 1 And History Screen has an Index Value Of 2)
+        self.selectedIndex = 1
         
     }
     

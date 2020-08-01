@@ -10,9 +10,6 @@ import UIKit
 
 class SettingsViewController: UIViewController {
     
-    //Initializing User Defaults
-    let companyNameUserDefault = UserDefaults.standard
-    let uenUserDefualt = UserDefaults.standard
     
     //Dimensions of Device Screen
     let screenWidth = UIScreen.main.bounds.width
@@ -24,10 +21,11 @@ class SettingsViewController: UIViewController {
     var makeCompanyNameTextField : UITextField?
     var makeUENTextField : UITextField?
 
+    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
         
         
         //Adds The Settings, Reference Number, Transaction Amount And Expiry Date Labels
@@ -56,14 +54,13 @@ class SettingsViewController: UIViewController {
         
         
         //Adding Stored Company Name & UEN Properties If Entered When The App Is Loaded
-        if let companyNameText = companyNameUserDefault.object(forKey: "Company_Name_Text") as? String {
+        if let companyNameText = UserDefaults.standard.string(forKey: "Company_Name_Text") {
             makeCompanyNameTextField?.text = companyNameText
         }
         
-        if let uenText = uenUserDefualt.object(forKey: "UEN_Text") as? String {
+        if let uenText = UserDefaults.standard.string(forKey: "UEN_Text") {
             makeUENTextField?.text = uenText
         }
-        
         
         
     }
@@ -74,9 +71,9 @@ class SettingsViewController: UIViewController {
     //When The User Taps On The Screen
     @objc func viewTapped(gestureRecognizer : UITapGestureRecognizer) {
         
-        //Stores The UEN & Company Name
-        companyNameUserDefault.set(makeCompanyNameTextField?.text, forKey: "Company_Name_Text")
-        uenUserDefualt.set(makeUENTextField?.text, forKey: "UEN_Text")
+        //Stores The UEN & Company Name In User Defaults
+        UserDefaults.standard.set(makeCompanyNameTextField?.text, forKey: "Company_Name_Text")
+        UserDefaults.standard.set(makeUENTextField?.text, forKey: "UEN_Text")
         //The Editor (Such As A Keyboard) Is Dismissed
         view.endEditing(true)
         
@@ -244,9 +241,9 @@ extension SettingsViewController : UITextFieldDelegate {
         makeCompanyNameTextField?.endEditing(true)
         makeUENTextField?.endEditing(true)
         
-        //Stores The UEN & Company Name
-        companyNameUserDefault.set(makeCompanyNameTextField?.text, forKey: "Company_Name_Text")
-        uenUserDefualt.set(makeUENTextField?.text, forKey: "UEN_Text")
+        //Stores The UEN & Company Name In User Defaults
+        UserDefaults.standard.set(makeCompanyNameTextField?.text, forKey: "Company_Name_Text")
+        UserDefaults.standard.set(makeUENTextField?.text, forKey: "UEN_Text")
         
         return true
         
