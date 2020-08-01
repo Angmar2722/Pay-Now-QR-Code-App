@@ -377,15 +377,24 @@ class GenerateViewController: UIViewController {
         let data = string.data(using: String.Encoding.ascii)
         
         if let filter = CIFilter(name: "CIQRCodeGenerator") {
+            
+            guard let colorFilter = CIFilter(name: "CIFalseColor") else { return nil }
+            
             filter.setValue(data, forKey: "inputMessage")
+            
+            filter.setValue("H", forKey: "inputCorrectionLevel")
+            colorFilter.setValue(filter.outputImage, forKey: "inputImage")
+            colorFilter.setValue(CIColor(red: 1, green: 1, blue: 1), forKey: "inputColor1") // Background white
+            colorFilter.setValue(CIColor(red: 124.0/256, green: 26.0/256, blue: 120.0/256, alpha: 1), forKey: "inputColor0") // Foreground (QR Code) Pay Now Purple Color
 
-            guard let qrImage = filter.outputImage else {return nil}
+            
+            guard let qrImage = colorFilter.outputImage else {return nil}
             let scaleX = imageView.frame.size.width / qrImage.extent.size.width
             let scaleY = imageView.frame.size.height / qrImage.extent.size.height
             let transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
 
             
-            if let output = filter.outputImage?.transformed(by: transform) {
+            if let output = colorFilter.outputImage?.transformed(by: transform) {
                 return UIImage(ciImage: output)
             }
         }

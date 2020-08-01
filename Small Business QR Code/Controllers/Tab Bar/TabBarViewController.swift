@@ -14,7 +14,7 @@ class TabBarViewController: UITabBarController {
         super.viewDidLoad()
 
         //The Line Below Shows The Default Screen When The App Is Launched (Settings Screen has an index value of 0, Generate Screen has an index value of 1 and History Screen has an index value of 2)
-        self.selectedIndex = 1
+        self.selectedIndex = 0
         
     }
     
