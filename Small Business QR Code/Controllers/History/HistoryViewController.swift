@@ -16,6 +16,14 @@ class HistoryViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     
+    
+    @IBAction func deleteIconPressed(_ sender: UIBarButtonItem) {
+    }
+    
+    
+    @IBAction func generateIconPressed(_ sender: UIBarButtonItem) {
+    }
+    
 
     /*
     // MARK: - Navigation

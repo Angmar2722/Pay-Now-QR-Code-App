@@ -198,13 +198,13 @@ class SettingsViewController: UIViewController {
     //Alert Which Is Called When The User Has Exceeded The Reference Number Character Limit
     func cannotExceedCompanyNameCharacterLimit() {
         
-        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number allowed is 30", preferredStyle: .alert)
+        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number allowed is 15", preferredStyle: .alert)
         
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
         
-        //Removes The Alert Automatically After A Deadline Of 10 Seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+        //Removes The Alert Automatically After A Deadline Of 20 Seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
             ac.dismiss(animated: true, completion: nil)
             self.viewWillAppear(true)
         }
@@ -219,8 +219,8 @@ class SettingsViewController: UIViewController {
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
         
-        //Removes The Alert Automatically After A Deadline Of 10 Seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+        //Removes The Alert Automatically After A Deadline Of 20 Seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
             ac.dismiss(animated: true, completion: nil)
             self.viewWillAppear(true)
         }
@@ -258,11 +258,11 @@ extension SettingsViewController : UITextFieldDelegate {
 
         case makeCompanyNameTextField:
 
-            if let transactionAmountText = makeCompanyNameTextField?.text {
+            if let companyNameText = makeCompanyNameTextField?.text {
 
-                let currentTransactionAmountText = transactionAmountText + string
+                let currentCompanyNameText = companyNameText + string
 
-                if currentTransactionAmountText.count > 30 {
+                if currentCompanyNameText.count > 15 {
 
                     cannotExceedCompanyNameCharacterLimit()
                     return false
@@ -273,11 +273,11 @@ extension SettingsViewController : UITextFieldDelegate {
 
         case makeUENTextField:
 
-            if let referenceNumberText = makeUENTextField?.text {
+            if let uenText = makeUENTextField?.text {
 
-                let currentReferenceNumberText = referenceNumberText + string
+                let currentUENText = uenText + string
 
-                if currentReferenceNumberText.count > 11 {
+                if currentUENText.count > 10 {
                     cannotExceedUENCharacterLimit()
                     return false
                 }

@@ -21,7 +21,7 @@ struct PayNowQRString {
     let companyName : String
     let referenceNumber : String
     
-    //The Default Value Of The Expiry Date Is December 31st, 2099 If The Expiry Date Is Not Selected
+    //The Default Value Of The Expiry Date Is 100 Years From The Time The QR Code Is Generated If The Expiry Date Is Not Selected
     init(inputUEN : String, inputExpiryDate : String, inputTransactionAmount : String, inputCompanyName : String, inputReferenceNumber : String) {
                 
         UEN = inputUEN
@@ -98,7 +98,7 @@ struct PayNowQRString {
         
     //Merchant Account Info Template Sub-Category : Payment Is Or Is Not Editable
     let isPaymentEditableStringID = "03"
-    //For The Value 0 = Payment Not Editable, 1 = Payment Is Editable
+    //The Value 0 = Payment Not Editable, 1 = Payment Is Editable
     let isPaymentEditableStringValue = "0"
     var isPaymentEditableStringCharLength : String {
         return "0\(isPaymentEditableStringValue.count)"

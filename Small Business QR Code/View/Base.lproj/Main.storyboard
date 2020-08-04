@@ -64,7 +64,7 @@
             </objects>
             <point key="canvasLocation" x="864" y="1497"/>
         </scene>
-        <!--History-->
+        <!--History View Controller-->
         <scene sceneID="Joh-z9-H69">
             <objects>
                 <viewController id="QxX-LX-qm5" customClass="HistoryViewController" customModule="Small_Business_QR_Code" customModuleProvider="target" sceneMemberID="viewController">
@@ -74,11 +74,22 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <viewLayoutGuide key="safeArea" id="MHm-y1-Jal"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="History" image="book" catalog="system" id="o7Z-rd-Sk7"/>
+                    <navigationItem key="navigationItem" id="xmL-Jm-eqh">
+                        <barButtonItem key="leftBarButtonItem" title="Delete" image="trash" catalog="system" id="6Yh-NN-HRB">
+                            <connections>
+                                <action selector="deleteIconPressed:" destination="QxX-LX-qm5" id="eaW-mG-bv3"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Generate" image="qrcode" catalog="system" id="kzp-2Y-BL5">
+                            <connections>
+                                <action selector="generateIconPressed:" destination="QxX-LX-qm5" id="lua-p1-zDu"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5SK-fE-wtY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1839" y="688"/>
+            <point key="canvasLocation" x="1838" y="1497"/>
         </scene>
         <!--Tab Bar View Controller-->
         <scene sceneID="yl2-sM-qoP">
@@ -92,7 +103,7 @@
                     <connections>
                         <segue destination="9pv-A4-QxB" kind="relationship" relationship="viewControllers" id="u7Y-xg-7CH"/>
                         <segue destination="oib-pj-4OJ" kind="relationship" relationship="viewControllers" id="lzU-1b-eKA"/>
-                        <segue destination="QxX-LX-qm5" kind="relationship" relationship="viewControllers" id="UUB-mk-aSY"/>
+                        <segue destination="Fju-Vv-sPK" kind="relationship" relationship="viewControllers" id="UUB-mk-aSY"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HuB-VB-40B" sceneMemberID="firstResponder"/>
@@ -118,6 +129,25 @@
             </objects>
             <point key="canvasLocation" x="863.768115942029" y="687.72321428571422"/>
         </scene>
+        <!--History-->
+        <scene sceneID="C6Q-bx-uRp">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Fju-Vv-sPK" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="History" image="book" catalog="system" id="o7Z-rd-Sk7"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Qey-rn-ULH">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="QxX-LX-qm5" kind="relationship" relationship="rootViewController" id="xoe-KG-a06"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gZ1-vp-McG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1837.68115942029" y="687.72321428571422"/>
+        </scene>
     </scenes>
     <resources>
         <image name="arrow.clockwise" catalog="system" width="115" height="128"/>
@@ -125,5 +155,6 @@
         <image name="qrcode" catalog="system" width="128" height="114"/>
         <image name="rays" catalog="system" width="128" height="122"/>
         <image name="square.and.arrow.up" catalog="system" width="115" height="128"/>
+        <image name="trash" catalog="system" width="121" height="128"/>
     </resources>
 </document>

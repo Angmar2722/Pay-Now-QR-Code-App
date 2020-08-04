@@ -29,7 +29,9 @@ class GenerateViewController: UIViewController {
     var format_YYYY_DD_MM_Date : String?
 
     var makeQRCodeButton : UIButton?
+    var widthAndHeightOfQRCode : CGFloat?
     var actualImageView : UIImageView?
+    var payNowLogoImageView : UIImageView?
     
     
     
@@ -65,7 +67,7 @@ class GenerateViewController: UIViewController {
         //Adds The Make QR Code Button To The View
         makeQRCodeButton = generateQRCodeButton()
         view.addSubview(makeQRCodeButton!)
-        
+
         
         //Adds the Date Picker To The Expiry Date Text Field To Select The Expiry Date
         let expiryDateDatePicker = UIDatePicker()
@@ -99,14 +101,16 @@ class GenerateViewController: UIViewController {
                     makeTransactionAmountTextField?.text = String(format: "%.2f", arguments: [amount])
                     view.endEditing(true)
                 } else {
-                    cannotExceedTransactionAmountCharacterLimit()
+                    callAlert(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number of characters allowed is 13 including the decimal point.", timeDeadline: 20)
                     view.endEditing(false)
                 }
                 
                 
             } else {
-                amountHasToBeANumber()
+            
+                callAlert(title: "Amount Entered Is Not A Number", message: "The Transaction Amount Has To Be A Number Like 99.99 or 99", timeDeadline: 15)
                 view.endEditing(false)
+                
             }
 
         } else {
@@ -189,6 +193,36 @@ class GenerateViewController: UIViewController {
     }
     
     
+    //This Function Returns An Image Which Displays Information Below The QR Code
+    func getExtraInfoLabelImage(companyName : String, UEN : String, transactionAmount : String) -> UIImage {
+        
+        let extraInfoLabel = UILabel()
+        
+        let last4CharactersOfUEN = UEN.suffix(4)
+        
+        extraInfoLabel.text = "\(companyName) (\(last4CharactersOfUEN)) $\(transactionAmount)"
+        
+        extraInfoLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
+        extraInfoLabel.textColor = UIColor.white
+        extraInfoLabel.textAlignment = .center
+        extraInfoLabel.adjustsFontSizeToFitWidth = true
+        
+        extraInfoLabel.frame = CGRect(x: 0, y: widthAndHeightOfQRCode! + CGFloat( (5 / 896) * screenHeight ), width: widthAndHeightOfQRCode!, height: CGFloat( (30 / 896) * screenHeight ))
+        
+        let payNowLogoPurpleColor = CIColor(red: 124.0/256, green: 26.0/256, blue: 120.0/256, alpha: 1)
+        extraInfoLabel.backgroundColor = UIColor(ciColor: payNowLogoPurpleColor)
+        
+        
+        UIGraphicsBeginImageContextWithOptions(extraInfoLabel.bounds.size, false, 0)
+        extraInfoLabel.drawHierarchy(in: extraInfoLabel.bounds, afterScreenUpdates: true)
+        let labelImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return labelImage!
+        
+    }
+    
+    
     
     func generateTransactionAmountTextField() -> UITextField {
 
@@ -258,6 +292,41 @@ class GenerateViewController: UIViewController {
         
         
         return expiryDateTextField
+        
+    }
+    
+    
+    func getFinalMergedImage(imageViewWidth : CGFloat, imageViewHeight : CGFloat, qrCodeWidthAndHeight : CGFloat, qrCodeImage : UIImage, payNowLogoImage : UIImage, extraInfoLabelImage : UIImage) -> UIImage {
+        
+        
+        //The Base Image Is The Image View And Its Dimensions
+        let bottomImageSize = CGSize(width: imageViewWidth, height: imageViewHeight)
+        
+        UIGraphicsBeginImageContext(bottomImageSize)
+        
+        //Draws The QR Code In A CG Rect
+        qrCodeImage.draw(in: CGRect(x: 0, y: 0, width: qrCodeWidthAndHeight, height: qrCodeWidthAndHeight))
+        
+        
+        //Draws The Pay Now Logo In A CG Rect
+        let iPhone11WidthANdHeightOfQRCode = CGFloat(283.9)
+        let xCord = (qrCodeWidthAndHeight / 2) - ( CGFloat( (111.5 / iPhone11WidthANdHeightOfQRCode) * widthAndHeightOfQRCode!) / 2 )
+        let yCord = (qrCodeWidthAndHeight / 2) - ( CGFloat( (80 / iPhone11WidthANdHeightOfQRCode) * qrCodeWidthAndHeight) / 2 )
+        
+        payNowLogoImage.draw(in: CGRect(x: xCord, y: yCord, width: CGFloat( (111.5 / 414) * screenWidth), height: CGFloat( (80 / 896) * screenHeight) ) )
+        
+        
+        //Adds The Label To The Bottom Of The QR Code Containing The Company Name, UEN, Transaction Amount
+        extraInfoLabelImage.draw(in: CGRect(x: 0, y: widthAndHeightOfQRCode! + 5, width: widthAndHeightOfQRCode!, height: 30))
+        
+        
+        //Stores The Newly Merged Image In A Constant
+        let finalMergedImage : UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+        
+        
+        UIGraphicsEndImageContext()
+        
+        return finalMergedImage
         
     }
     
@@ -346,39 +415,38 @@ class GenerateViewController: UIViewController {
                 let finalPayNowQRString = payNowQRString.getFinalPayNowQRString()
                 
                 
-                //Calculating The Width And Height Of The Image View To House The QR Code
-                let safeAreaFrame = self.view.safeAreaLayoutGuide.layoutFrame
-                let safeAreaHeight = safeAreaFrame.height
-                let screenAreaFactoringInSafeAreaHeight = (safeAreaHeight * screenWidth)
-                let screenAreaPercenageOccupiedByQRCode = ( CGFloat(334 * 334) / CGFloat(725 * 414) ) * 100
-                let screenAreaOfQRCode = ( screenAreaPercenageOccupiedByQRCode / 100 ) * screenAreaFactoringInSafeAreaHeight
-                let widthAndHeightOfQRCode = screenAreaOfQRCode.squareRoot()
-
+                //Calculating The Width And Height Of The QR Code As Well As The X Co-Ordinate Of The Image View
+                widthAndHeightOfQRCode = (85/100) * (makeQRCodeButton?.frame.width)!
+                let qrCodeXCordPadding = ( (makeQRCodeButton?.frame.width)! - widthAndHeightOfQRCode! ) / 2
+                let imageViewXPos = (makeQRCodeButton?.frame.minX)! + qrCodeXCordPadding
                 
                 //Creates A Placeholder Image View To Send To The Generate QR Code Function
                 let imageViewToHouseQRCode = UIImageView()
-                imageViewToHouseQRCode.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode, height: widthAndHeightOfQRCode)
-                imageViewToHouseQRCode.backgroundColor = .systemRed
+                imageViewToHouseQRCode.frame = CGRect(x: CGFloat( (imageViewXPos / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode!, height: widthAndHeightOfQRCode! + CGFloat( (40 / 896) * screenHeight ))
                 
-                //Calls The Generate QR Code Function To Generate The Actual QR Code And Stores The QR Code Image In The Specified Constant
-                let qrCodeImage = generateQRCode(from: "\(finalPayNowQRString)", with: imageViewToHouseQRCode)
+                //Constants Storing 3 Images To Be MErged
+                let qrCodeImage = generateQRCode(from: "\(finalPayNowQRString)", with: imageViewToHouseQRCode)!
+                let payNowLogo = #imageLiteral(resourceName: "Pay Now Logo")
+                let extraInfoLabelImage = getExtraInfoLabelImage(companyName: finalCompanyNameString, UEN: finalUENString, transactionAmount: transactionAmount)
                 
-                //Creates The Actual Image View To Which The Generated QR Code Is Added To
-                actualImageView = UIImageView(image: qrCodeImage)
-                actualImageView!.frame = CGRect(x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode, height: widthAndHeightOfQRCode)
-                // NOTE : The Width And Height Specified Above Should Be Equal So That The QR Code Is A Square
+                let finalMergedImage = getFinalMergedImage(imageViewWidth: imageViewToHouseQRCode.frame.width, imageViewHeight: imageViewToHouseQRCode.frame.height, qrCodeWidthAndHeight: widthAndHeightOfQRCode!, qrCodeImage: qrCodeImage, payNowLogoImage: payNowLogo, extraInfoLabelImage: extraInfoLabelImage)
+                            
+                //Creates The Actual Image View To Which The Merged Image Is Added To
+                actualImageView = UIImageView(image: finalMergedImage)
+                actualImageView!.frame = imageViewToHouseQRCode.frame
                 view.addSubview(actualImageView!)
                 
                    
             } else  {
                 
-                cannotGenerateQRWithoutInputAlert()
+                callAlert(title: "Cannot Generate QR Code", message: "Please Make Sure That The Amount ($) And The Reference Number Field Is Filled In", timeDeadline: 20)
                 
             }
             
+            
         } else {
             
-            didNotInputUENOrCompanyName()
+            callAlert(title: "Cannot Generate QR Code", message: "Please Make Sure Than You Have Filled In Your Company Name And Its UEN In The Settings Page", timeDeadline: 20)
             
         }
         
@@ -403,116 +471,33 @@ class GenerateViewController: UIViewController {
             colorFilter.setValue(CIColor(red: 1, green: 1, blue: 1), forKey: "inputColor1") // Background white
             colorFilter.setValue(CIColor(red: 124.0/256, green: 26.0/256, blue: 120.0/256, alpha: 1), forKey: "inputColor0") // Foreground (QR Code) Pay Now Purple Color
 
-            
+    
             guard let qrImage = colorFilter.outputImage else {return nil}
             let scaleX = imageView.frame.size.width / qrImage.extent.size.width
             let scaleY = imageView.frame.size.height / qrImage.extent.size.height
             let transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
-
+            
             
             if let output = colorFilter.outputImage?.transformed(by: transform) {
                 return UIImage(ciImage: output)
             }
+            
         }
+        
         return nil
         
     }
     
     
-    
-    //Alert Which Is Called When The User Tries To Generate A QR Code Without Filling In The UEN & Company Name In The Settings Page
-    func didNotInputUENOrCompanyName() {
+    func callAlert(title : String, message : String, timeDeadline : Double) {
         
-        let ac = UIAlertController(title: "Cannot Generate QR Code", message: "Please Make Sure Than You Have Filled In Your Company Name And Its UEN In The Settings Page", preferredStyle: .alert)
+        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
         
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
         
-        //Removes The Alert Automatically After A Deadline Of 10 Seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
-            ac.dismiss(animated: true, completion: nil)
-            self.viewWillAppear(true)
-        }
-        
-    }
-    
-    
-    //Function Which Presents An Alert When Called. This Alert Is Called When The Transaction Amount Text Field And/Or The Reference Number Text Field Were Not Filled
-    func cannotGenerateQRWithoutInputAlert() {
-        
-        let ac = UIAlertController(title: "Cannot Generate QR Code", message: "Please Make Sure That The Amount ($) And The Reference Number Field Is Filled In", preferredStyle: .alert)
-        
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
-        present(ac, animated: true)
-        
-        //Removes The Alert Automatically After A Deadline Of 15 Seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
-            ac.dismiss(animated: true, completion: nil)
-            self.viewWillAppear(true)
-        }
-        
-    }
-    
-    //Alert Which Is Called When The User Has Exceeded The Transaction Amount Character Limit
-    func cannotExceedTransactionAmountCharacterLimit() {
-        
-        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number of characters allowed is 13 including the decimal point.", preferredStyle: .alert)
-        
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
-        present(ac, animated: true)
-        
-        //Removes The Alert Automatically After A Deadline Of 10 Seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-            ac.dismiss(animated: true, completion: nil)
-            self.viewWillAppear(true)
-        }
-        
-    }
-    
-    //Alert Which Is Called When The User Has Exceeded The Reference Number Character Limit
-    func cannotExceedRefNoCharacterLimit() {
-        
-        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number allowed is 30", preferredStyle: .alert)
-        
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
-        present(ac, animated: true)
-        
-        //Removes The Alert Automatically After A Deadline Of 10 Seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-            ac.dismiss(animated: true, completion: nil)
-            self.viewWillAppear(true)
-        }
-        
-    }
-    
-    
-    //Alert Which Is Called When The Transaction Amount Entered Is Not A Number
-    func amountHasToBeANumber() {
-        
-        let ac = UIAlertController(title: "Amount Entered Is Not A Number", message: "The Transaction Amount Has To Be A Number Like 99.99 or 99", preferredStyle: .alert)
-        
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
-        present(ac, animated: true)
-        
-        //Removes The Alert Automatically After A Deadline Of 10 Seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-            ac.dismiss(animated: true, completion: nil)
-            self.viewWillAppear(true)
-        }
-        
-    }
-    
-    
-    //Alert Which Is Called When The QR Code Image Is Successfully Copied
-    func successfullyCopied() {
-        
-        let ac = UIAlertController(title: "QR Code Successfully Copied!", message: "", preferredStyle: .alert)
-        
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
-        present(ac, animated: true)
-        
-        //Removes The Alert Automatically After A Deadline Of 10 Seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+        //Removes The Alert Automatically After A Deadline Of The Specified Seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + timeDeadline) {
             ac.dismiss(animated: true, completion: nil)
             self.viewWillAppear(true)
         }
@@ -539,7 +524,7 @@ class GenerateViewController: UIViewController {
     
     @IBAction func copyPressed(_ sender: UIBarButtonItem) {
         UIPasteboard.general.image = actualImageView?.image
-        successfullyCopied()
+        callAlert(title: "QR Code Successfully Copied!", message: "", timeDeadline: 10)
     }
     
     
@@ -550,7 +535,6 @@ class GenerateViewController: UIViewController {
     }
     
     
-
 }
 
 
@@ -614,8 +598,8 @@ extension GenerateViewController : UITextFieldDelegate {
                 let currentTransactionAmountText = transactionAmountText + string
 
                 if currentTransactionAmountText.count > 13 {
-
-                    cannotExceedTransactionAmountCharacterLimit()
+                    
+                    callAlert(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number of characters allowed is 13 including the decimal point.", timeDeadline: 20)
                     return false
 
                 }
@@ -629,8 +613,10 @@ extension GenerateViewController : UITextFieldDelegate {
                 let currentReferenceNumberText = referenceNumberText + string
 
                 if currentReferenceNumberText.count > 30 {
-                    cannotExceedRefNoCharacterLimit()
+                    
+                    callAlert(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number allowed is 30", timeDeadline: 20)
                     return false
+                    
                 }
 
             }
@@ -642,6 +628,7 @@ extension GenerateViewController : UITextFieldDelegate {
         return true
 
     }
+    
    
     func textFieldDidEndEditing(_ textField: UITextField) {
         
@@ -652,8 +639,8 @@ extension GenerateViewController : UITextFieldDelegate {
                 }
         }
       
-        
     }
+    
     
     //Removes The QR Code Image When The User Begins Editing On A Text Field
     func textFieldDidBeginEditing(_ textField: UITextField) {
