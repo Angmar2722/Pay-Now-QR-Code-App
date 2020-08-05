@@ -363,6 +363,8 @@ class GenerateViewController: UIViewController {
         //Dismisses The Date Picker If the User Clicks On The Generate QR Button While The Date Picker Is Selected
         view.endEditing(true)
         
+        //Removes Any Existing Image When The Generate Button Is Pressed
+        actualImageView?.image = nil
         
         //Fetches The Company Name & UEN From The Settings View Controller
         let companyNameString = UserDefaults.standard.string(forKey: "Company_Name_Text")
