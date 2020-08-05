@@ -18,6 +18,7 @@
 		6A1BC39724C693D500839930 /* HistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A1BC39624C693D500839930 /* HistoryViewController.swift */; };
 		6A1BC39924C6954500839930 /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A1BC39824C6954500839930 /* TabBarViewController.swift */; };
 		6A1BC39F24CBDF5F00839930 /* PayNowQRString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A1BC39E24CBDF5F00839930 /* PayNowQRString.swift */; };
+		6A3F1C6924DAC4D900C24945 /* MiscFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A3F1C6824DAC4D900C24945 /* MiscFunctions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		6A1BC39624C693D500839930 /* HistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewController.swift; sourceTree = "<group>"; };
 		6A1BC39824C6954500839930 /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		6A1BC39E24CBDF5F00839930 /* PayNowQRString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayNowQRString.swift; sourceTree = "<group>"; };
+		6A3F1C6824DAC4D900C24945 /* MiscFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiscFunctions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,7 +92,7 @@
 		6A1BC39424C6936500839930 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				6A1BC39E24CBDF5F00839930 /* PayNowQRString.swift */,
+				6A3F1C6724DAC4A100C24945 /* Generate VC */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -136,6 +138,15 @@
 				6A1BC39824C6954500839930 /* TabBarViewController.swift */,
 			);
 			path = "Tab Bar";
+			sourceTree = "<group>";
+		};
+		6A3F1C6724DAC4A100C24945 /* Generate VC */ = {
+			isa = PBXGroup;
+			children = (
+				6A1BC39E24CBDF5F00839930 /* PayNowQRString.swift */,
+				6A3F1C6824DAC4D900C24945 /* MiscFunctions.swift */,
+			);
+			path = "Generate VC";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -213,6 +224,7 @@
 				6A1BC37F24C6922A00839930 /* SettingsViewController.swift in Sources */,
 				6A1BC37B24C6922A00839930 /* AppDelegate.swift in Sources */,
 				6A1BC39724C693D500839930 /* HistoryViewController.swift in Sources */,
+				6A3F1C6924DAC4D900C24945 /* MiscFunctions.swift in Sources */,
 				6A1BC39924C6954500839930 /* TabBarViewController.swift in Sources */,
 				6A1BC37D24C6922A00839930 /* SceneDelegate.swift in Sources */,
 				6A1BC38724C6922A00839930 /* Small_Business_QR_Code.xcdatamodeld in Sources */,

@@ -16,21 +16,23 @@ import Foundation
 struct PayNowQRString {
     
     let UEN : String
-    let expiryDate : String
+    let expiryDate : String?
     let transactionAmount : String
     let companyName : String
     let referenceNumber : String
     
-    //The Default Value Of The Expiry Date Is 100 Years From The Time The QR Code Is Generated If The Expiry Date Is Not Selected
-    init(inputUEN : String, inputExpiryDate : String, inputTransactionAmount : String, inputCompanyName : String, inputReferenceNumber : String) {
+    
+    init(inputUEN : String, inputExpiryDate : String?, inputTransactionAmount : String, inputCompanyName : String, inputReferenceNumber : String) {
                 
         UEN = inputUEN
+        //If The Input Expiry Date Is "0", The Expiry Date Is Not Generated
         expiryDate = inputExpiryDate
         transactionAmount = inputTransactionAmount
         companyName = inputCompanyName
         referenceNumber = inputReferenceNumber
         
     }
+    
         
     //Payload Format Indicator String
     let payloadFormatIndicatorStringID = "00"
@@ -108,16 +110,19 @@ struct PayNowQRString {
     }
         
     //Merchant Account Info Template Sub-Category : Expiry Date (YYYYMMDD Format) (This Is An Optional Category)
-    let expiryDateStringID = "04"
-    var expiryDateStringValue : String {
-        return "\(expiryDate)"
-    }
-    var expiryDateStringCharLength : String {
-        return "0\(expiryDateStringValue.count)"
-    }
     var expiryDateString : String {
-        return "\(expiryDateStringID)\(expiryDateStringCharLength)\(expiryDateStringValue)"
+        
+        if expiryDate == "0" {
+            return ""
+        } else {
+            let expiryDateStringID = "04"
+            let expiryDateStringValue = "\(expiryDate!)"
+            let expiryDateStringCharLength = "0\(expiryDateStringValue.count)"
+            return "\(expiryDateStringID)\(expiryDateStringCharLength)\(expiryDateStringValue)"
+        }
+        
     }
+  
         
     //Merchant Account Info Template (ID-26)
     let merchantAccountInfoTemplateStringID = "26"
@@ -319,7 +324,6 @@ struct PayNowQRString {
     func getFinalPayNowQRString() -> String {
         return finalPayNowQRString
     }
-        
     
-    
+   
 }

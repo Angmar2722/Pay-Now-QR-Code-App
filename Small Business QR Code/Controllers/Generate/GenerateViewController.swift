@@ -10,9 +10,11 @@ import UIKit
 
 class GenerateViewController: UIViewController {
     
-    
     //Initializing Other View Controller Objects
     var settingsViewController : SettingsViewController?
+    
+    //Initializing Accompanying Model Files
+    let miscFunctions = MiscFunctions()
     
     //Dimensions of Device Screen
     let screenWidth = UIScreen.main.bounds.width
@@ -26,7 +28,6 @@ class GenerateViewController: UIViewController {
     var makeExpiryDateTextField : UITextField?
     
     var makeExpiryDateDatePicker : UIDatePicker?
-    var format_YYYY_DD_MM_Date : String?
 
     var makeQRCodeButton : UIButton?
     var widthAndHeightOfQRCode : CGFloat?
@@ -193,37 +194,6 @@ class GenerateViewController: UIViewController {
     }
     
     
-    //This Function Returns An Image Which Displays Information Below The QR Code
-    func getExtraInfoLabelImage(companyName : String, UEN : String, transactionAmount : String) -> UIImage {
-        
-        let extraInfoLabel = UILabel()
-        
-        let last4CharactersOfUEN = UEN.suffix(4)
-        
-        extraInfoLabel.text = "\(companyName) (\(last4CharactersOfUEN)) $\(transactionAmount)"
-        
-        extraInfoLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
-        extraInfoLabel.textColor = UIColor.white
-        extraInfoLabel.textAlignment = .center
-        extraInfoLabel.adjustsFontSizeToFitWidth = true
-        
-        extraInfoLabel.frame = CGRect(x: 0, y: widthAndHeightOfQRCode! + CGFloat( (5 / 896) * screenHeight ), width: widthAndHeightOfQRCode!, height: CGFloat( (30 / 896) * screenHeight ))
-        
-        let payNowLogoPurpleColor = CIColor(red: 124.0/256, green: 26.0/256, blue: 120.0/256, alpha: 1)
-        extraInfoLabel.backgroundColor = UIColor(ciColor: payNowLogoPurpleColor)
-        
-        
-        UIGraphicsBeginImageContextWithOptions(extraInfoLabel.bounds.size, false, 0)
-        extraInfoLabel.drawHierarchy(in: extraInfoLabel.bounds, afterScreenUpdates: true)
-        let labelImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        return labelImage!
-        
-    }
-    
-    
-    
     func generateTransactionAmountTextField() -> UITextField {
 
         let transactionAmountTextField = UITextField()
@@ -296,41 +266,6 @@ class GenerateViewController: UIViewController {
     }
     
     
-    func getFinalMergedImage(imageViewWidth : CGFloat, imageViewHeight : CGFloat, qrCodeWidthAndHeight : CGFloat, qrCodeImage : UIImage, payNowLogoImage : UIImage, extraInfoLabelImage : UIImage) -> UIImage {
-        
-        
-        //The Base Image Is The Image View And Its Dimensions
-        let bottomImageSize = CGSize(width: imageViewWidth, height: imageViewHeight)
-        
-        UIGraphicsBeginImageContext(bottomImageSize)
-        
-        //Draws The QR Code In A CG Rect
-        qrCodeImage.draw(in: CGRect(x: 0, y: 0, width: qrCodeWidthAndHeight, height: qrCodeWidthAndHeight))
-        
-        
-        //Draws The Pay Now Logo In A CG Rect
-        let iPhone11WidthANdHeightOfQRCode = CGFloat(283.9)
-        let xCord = (qrCodeWidthAndHeight / 2) - ( CGFloat( (111.5 / iPhone11WidthANdHeightOfQRCode) * widthAndHeightOfQRCode!) / 2 )
-        let yCord = (qrCodeWidthAndHeight / 2) - ( CGFloat( (80 / iPhone11WidthANdHeightOfQRCode) * qrCodeWidthAndHeight) / 2 )
-        
-        payNowLogoImage.draw(in: CGRect(x: xCord, y: yCord, width: CGFloat( (111.5 / 414) * screenWidth), height: CGFloat( (80 / 896) * screenHeight) ) )
-        
-        
-        //Adds The Label To The Bottom Of The QR Code Containing The Company Name, UEN, Transaction Amount
-        extraInfoLabelImage.draw(in: CGRect(x: 0, y: widthAndHeightOfQRCode! + 5, width: widthAndHeightOfQRCode!, height: 30))
-        
-        
-        //Stores The Newly Merged Image In A Constant
-        let finalMergedImage : UIImage = UIGraphicsGetImageFromCurrentImageContext()!
-        
-        
-        UIGraphicsEndImageContext()
-        
-        return finalMergedImage
-        
-    }
-    
-    
     //Creates A Button Which When Clicked On Generates The QR Code
     func generateQRCodeButton() -> UIButton {
         
@@ -356,7 +291,6 @@ class GenerateViewController: UIViewController {
     }
     
     
-    
     //The Action Which Occurs When The Generate QR Code Button Is Clicked
     @objc func generateQRCodeButtonClicked(sender:UIButton) {
         
@@ -373,49 +307,30 @@ class GenerateViewController: UIViewController {
         
         if companyNameString != Optional("") && uenString != Optional("") {
             
+            
             if makeTransactionAmountTextField?.text != Optional("") && makeReferenceNumberTextField?.text != Optional("") {
-                
                 
                 //Constats To Store The Transaction Amount As Well As The Reference Number
                 let transactionAmount = (makeTransactionAmountTextField?.text)!
                 let referenceNumber = (makeReferenceNumberTextField?.text)!
                 
                 
-                //Calculating The Formatted Date (YYYYMMDD) For Use In The Pay Now QR String If The Expiry Date Text Field Is Or Is Not Empty
-                if let unformattedDateString = makeExpiryDateTextField?.text {
-                    
-                    let unformattedDateFormatter = DateFormatter()
-                    unformattedDateFormatter.dateFormat = "dd/MM/yyyy"
-                    let unformattedDateButOfDateType = unformattedDateFormatter.date(from: unformattedDateString)
-                    
-                    let requiredDateFormat = DateFormatter()
-                    requiredDateFormat.dateFormat = "yyyyMMdd"
-                    
-                    //The Constant Below Stores The Default Date Value Where The Value Is 100 Years From the Time 'Now' In Seconds
-                    let defaultDateValueInSeconds = Date(timeIntervalSinceNow: 3155760000)
-                    
-                    //The Variable 'format_YYYY_DD_MM_Date' Has A Default Date Value Of 100 Years From 'Now' In Seconds
-                    format_YYYY_DD_MM_Date = requiredDateFormat.string(from: unformattedDateButOfDateType ?? defaultDateValueInSeconds)
-                    
-                    //The Constant Below Stores The Default Date Value Of 100 Years From 'Now' In The Required YYYYMMDD Format For The Pay Now QR String
-                    let defaultDateValueStringInRequiredDateFormat = requiredDateFormat.string(from: defaultDateValueInSeconds)
-                    
-                    //If The User Does Not Pick An Expiry Date, The Default Expiry Date Is Chosen Which is 100 Years From Now. The Line Below Converts The Date Variable To A String With A Value Of 100 Years From 'Now'
-                    if format_YYYY_DD_MM_Date == defaultDateValueStringInRequiredDateFormat {
-                        format_YYYY_DD_MM_Date = defaultDateValueStringInRequiredDateFormat
-                    }
-                    
-                }
-                
-                
                 //For Testing Purposes : Qryptal UEN Is 201101550Z
-                //Fetches The Final Unwrapped Company Name & UEN String
+                //Fetches The Final Unwrapped Company Name & UEN String & Formatted Date
                 let finalCompanyNameString = (companyNameString)!
                 let finalUENString = (uenString)!
-                //Fetches The Final Pay Now QR Code String From The 'PayNowQRString' Model
-                let payNowQRString = PayNowQRString(inputUEN: "\(finalUENString)", inputExpiryDate: "\(format_YYYY_DD_MM_Date!)", inputTransactionAmount: "\(transactionAmount)", inputCompanyName: "\(finalCompanyNameString)", inputReferenceNumber: "\(referenceNumber)")
-                let finalPayNowQRString = payNowQRString.getFinalPayNowQRString()
                 
+                var format_YYYY_DD_MM_Date : String
+                if makeExpiryDateTextField?.text != Optional("") {
+                    format_YYYY_DD_MM_Date = miscFunctions.getFormattedDate(dateText: makeExpiryDateTextField?.text)
+                } else {
+                    format_YYYY_DD_MM_Date = "0"
+                }
+                
+                //Fetches The Final Pay Now QR Code String From The 'PayNowQRString' Model
+                let payNowQRString = PayNowQRString(inputUEN: "\(finalUENString)", inputExpiryDate: "\(format_YYYY_DD_MM_Date)", inputTransactionAmount: "\(transactionAmount)", inputCompanyName: "\(finalCompanyNameString)", inputReferenceNumber: "\(referenceNumber)")
+                let finalPayNowQRString = payNowQRString.getFinalPayNowQRString()
+                print(finalPayNowQRString)
                 
                 //Calculating The Width And Height Of The QR Code As Well As The X Co-Ordinate Of The Image View
                 widthAndHeightOfQRCode = (85/100) * (makeQRCodeButton?.frame.width)!
@@ -426,12 +341,12 @@ class GenerateViewController: UIViewController {
                 let imageViewToHouseQRCode = UIImageView()
                 imageViewToHouseQRCode.frame = CGRect(x: CGFloat( (imageViewXPos / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode!, height: widthAndHeightOfQRCode! + CGFloat( (40 / 896) * screenHeight ))
                 
-                //Constants Storing 3 Images To Be MErged
-                let qrCodeImage = generateQRCode(from: "\(finalPayNowQRString)", with: imageViewToHouseQRCode)!
+                //Constants Storing 3 Images To Be Merged
+                let qrCodeImage = miscFunctions.generateQRCode(from: "\(finalPayNowQRString)", with: imageViewToHouseQRCode)!
                 let payNowLogo = #imageLiteral(resourceName: "Pay Now Logo")
-                let extraInfoLabelImage = getExtraInfoLabelImage(companyName: finalCompanyNameString, UEN: finalUENString, transactionAmount: transactionAmount)
+                let extraInfoLabelImage = miscFunctions.getExtraInfoLabelImage(companyName: finalCompanyNameString, UEN: finalUENString, transactionAmount: transactionAmount, qrCodeWidthAndHeight: widthAndHeightOfQRCode!)
                 
-                let finalMergedImage = getFinalMergedImage(imageViewWidth: imageViewToHouseQRCode.frame.width, imageViewHeight: imageViewToHouseQRCode.frame.height, qrCodeWidthAndHeight: widthAndHeightOfQRCode!, qrCodeImage: qrCodeImage, payNowLogoImage: payNowLogo, extraInfoLabelImage: extraInfoLabelImage)
+                let finalMergedImage = miscFunctions.getFinalMergedImage(imageViewWidth: imageViewToHouseQRCode.frame.width, imageViewHeight: imageViewToHouseQRCode.frame.height, qrCodeWidthAndHeight: widthAndHeightOfQRCode!, qrCodeImage: qrCodeImage, payNowLogoImage: payNowLogo, extraInfoLabelImage: extraInfoLabelImage)
                             
                 //Creates The Actual Image View To Which The Merged Image Is Added To
                 actualImageView = UIImageView(image: finalMergedImage)
@@ -452,41 +367,6 @@ class GenerateViewController: UIViewController {
             
         }
         
-        
-    }
-    
-    
-    
-    //Function Which Generates The QR Code
-    func generateQRCode(from string: String, with imageView: UIImageView) -> UIImage? {
-        
-        let data = string.data(using: String.Encoding.ascii)
-        
-        if let filter = CIFilter(name: "CIQRCodeGenerator") {
-            
-            guard let colorFilter = CIFilter(name: "CIFalseColor") else { return nil }
-            
-            filter.setValue(data, forKey: "inputMessage")
-            
-            filter.setValue("H", forKey: "inputCorrectionLevel")
-            colorFilter.setValue(filter.outputImage, forKey: "inputImage")
-            colorFilter.setValue(CIColor(red: 1, green: 1, blue: 1), forKey: "inputColor1") // Background white
-            colorFilter.setValue(CIColor(red: 124.0/256, green: 26.0/256, blue: 120.0/256, alpha: 1), forKey: "inputColor0") // Foreground (QR Code) Pay Now Purple Color
-
-    
-            guard let qrImage = colorFilter.outputImage else {return nil}
-            let scaleX = imageView.frame.size.width / qrImage.extent.size.width
-            let scaleY = imageView.frame.size.height / qrImage.extent.size.height
-            let transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
-            
-            
-            if let output = colorFilter.outputImage?.transformed(by: transform) {
-                return UIImage(ciImage: output)
-            }
-            
-        }
-        
-        return nil
         
     }
     
