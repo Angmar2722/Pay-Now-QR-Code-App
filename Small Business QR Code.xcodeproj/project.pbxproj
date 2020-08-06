@@ -92,7 +92,7 @@
 		6A1BC39424C6936500839930 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				6A3F1C6724DAC4A100C24945 /* Generate VC */,
+				6A3F1C6724DAC4A100C24945 /* Generate VC & Settings VC */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -140,13 +140,13 @@
 			path = "Tab Bar";
 			sourceTree = "<group>";
 		};
-		6A3F1C6724DAC4A100C24945 /* Generate VC */ = {
+		6A3F1C6724DAC4A100C24945 /* Generate VC & Settings VC */ = {
 			isa = PBXGroup;
 			children = (
 				6A1BC39E24CBDF5F00839930 /* PayNowQRString.swift */,
 				6A3F1C6824DAC4D900C24945 /* MiscFunctions.swift */,
 			);
-			path = "Generate VC";
+			path = "Generate VC & Settings VC";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

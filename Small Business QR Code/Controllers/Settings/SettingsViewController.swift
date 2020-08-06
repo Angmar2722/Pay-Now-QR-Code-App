@@ -11,15 +11,17 @@ import UIKit
 class SettingsViewController: UIViewController {
     
     
+    //Initializing Accompanying Model Files
+    let miscFunctions = MiscFunctions()
+    
     //Dimensions of Device Screen
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
     let screenArea = UIScreen.main.bounds.width * UIScreen.main.bounds.height
     
-    
     //Initializing Screen UI Components
-    var makeCompanyNameTextField : UITextField?
-    var makeUENTextField : UITextField?
+    var companyNameTextField : UITextField?
+    var uenTextField : UITextField?
 
     
 
@@ -29,24 +31,27 @@ class SettingsViewController: UIViewController {
         
         
         //Adds The Settings, Reference Number, Transaction Amount And Expiry Date Labels
-        let makeSettingsTextLabel = generateSettingsTextLabel()
-        let makeCompanyNameTextFieldLabel = generateCompanyNameTextFieldLabel()
-        let makeUENTextFieldLabel = generateUENTextFieldLabel()
+        let settingsTextLabel = miscFunctions.getTextFieldLabel(text: "Settings", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 55, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 0, frameY: 80, frameWidth: 414, frameHeight: 80, backgroundColor: .white)
         
-        view.addSubview(makeSettingsTextLabel)
-        view.addSubview(makeCompanyNameTextFieldLabel)
-        view.addSubview(makeUENTextFieldLabel)
+        let companyNameTextFieldLabel = miscFunctions.getTextFieldLabel(text: "Company Name", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 225, frameWidth: 140, frameHeight: 80, backgroundColor: .white)
+        
+        let uenTextFieldLabel = miscFunctions.getTextFieldLabel(text: "UEN", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 370, frameWidth: 140, frameHeight: 60, backgroundColor: .white)
+        
+        view.addSubview(settingsTextLabel)
+        view.addSubview(companyNameTextFieldLabel)
+        view.addSubview(uenTextFieldLabel)
         
         
         //Adds The Reference Number, Transaction Amount And Expiry Date Text Fields To The View
-        makeCompanyNameTextField = generateCompanyNameTextField()
-        makeUENTextField = generateUENTextField()
+        companyNameTextField = miscFunctions.getTextField(placeholderText: "E.g. Qryptal", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 170, frameY: 230, frameWidth: 234, frameHeight: 60, cornerRadius: 25, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
         
-        makeCompanyNameTextField!.delegate = self
-        makeUENTextField!.delegate = self
+        uenTextField = miscFunctions.getTextField(placeholderText: "E.g. 53222036J", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 170, frameY: 370, frameWidth: 234, frameHeight: 60, cornerRadius: 25, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
         
-        view.addSubview(makeCompanyNameTextField!)
-        view.addSubview(makeUENTextField!)
+        companyNameTextField!.delegate = self
+        uenTextField!.delegate = self
+        
+        view.addSubview(companyNameTextField!)
+        view.addSubview(uenTextField!)
         
         //Adds the Tap Gesture Where The User Can Tap Elsewhere On The Screen To Dismiss The Editor (Such As A Keyboard Or A Date Picker)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(SettingsViewController.viewTapped(gestureRecognizer:)))
@@ -55,11 +60,11 @@ class SettingsViewController: UIViewController {
         
         //Adding Stored Company Name & UEN Properties If Entered When The App Is Loaded
         if let companyNameText = UserDefaults.standard.string(forKey: "Company_Name_Text") {
-            makeCompanyNameTextField?.text = companyNameText
+            companyNameTextField?.text = companyNameText
         }
         
         if let uenText = UserDefaults.standard.string(forKey: "UEN_Text") {
-            makeUENTextField?.text = uenText
+            uenTextField?.text = uenText
         }
         
         
@@ -72,155 +77,23 @@ class SettingsViewController: UIViewController {
     @objc func viewTapped(gestureRecognizer : UITapGestureRecognizer) {
         
         //Stores The UEN & Company Name In User Defaults
-        UserDefaults.standard.set(makeCompanyNameTextField?.text, forKey: "Company_Name_Text")
-        UserDefaults.standard.set(makeUENTextField?.text, forKey: "UEN_Text")
+        UserDefaults.standard.set(companyNameTextField?.text, forKey: "Company_Name_Text")
+        UserDefaults.standard.set(uenTextField?.text, forKey: "UEN_Text")
         //The Editor (Such As A Keyboard) Is Dismissed
         view.endEditing(true)
         
     }
     
     
-    func generateSettingsTextLabel() -> UILabel {
+    func callAlert(title : String, message : String, timeDeadline : Double) {
         
-        let settingsTextLabel = UILabel()
-
-        //Label Text Features
-        settingsTextLabel.text = "Settings"
-        settingsTextLabel.textAlignment = .center
-        settingsTextLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (55 / 896) * screenHeight ))
-        settingsTextLabel.textColor = UIColor.black
-        settingsTextLabel.numberOfLines = 0
-        settingsTextLabel.adjustsFontSizeToFitWidth = true
-        
-        //Label Text Field Dimensions And Co-Ordinates
-        settingsTextLabel.frame = CGRect(x: CGFloat( (0 / 414) * screenWidth), y: CGFloat( (80 / 896) * screenHeight), width: CGFloat( (414 / 414) * screenWidth), height: CGFloat( (80 / 896) * screenHeight))
-        
-        //Label Text Field Background / Border Attributes
-        settingsTextLabel.layer.borderWidth = 0
-        settingsTextLabel.backgroundColor = UIColor.white
-        
-        return settingsTextLabel
-        
-    }
-    
-    
-    func generateCompanyNameTextFieldLabel() -> UILabel {
-        
-        let companyNameTextFieldLabel = UILabel()
-        
-        //Label Text Features
-        companyNameTextFieldLabel.text = "Company Name"
-        companyNameTextFieldLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (33 / 896) * screenHeight ))
-        companyNameTextFieldLabel.textColor = UIColor.black
-        companyNameTextFieldLabel.numberOfLines = 0
-        companyNameTextFieldLabel.adjustsFontSizeToFitWidth = true
-        
-        //Label Text Field Dimensions And Co-Ordinates
-        companyNameTextFieldLabel.frame = CGRect(x: CGFloat( (20 / 414) * screenWidth), y: CGFloat( (225 / 896) * screenHeight), width: CGFloat( (140 / 414) * screenWidth), height: CGFloat( (80 / 896) * screenHeight))
-        
-        //Label Text Field Background / Border Attributes
-        companyNameTextFieldLabel.layer.borderWidth = 0
-        companyNameTextFieldLabel.backgroundColor = UIColor.white
-        
-        return companyNameTextFieldLabel
-        
-    }
-    
-    
-    func generateUENTextFieldLabel() -> UILabel {
-        
-        let uenTextFieldLabel = UILabel()
-        
-        //Label Text Features
-        uenTextFieldLabel.text = "UEN"
-        uenTextFieldLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (33 / 896) * screenHeight ))
-        uenTextFieldLabel.textColor = UIColor.black
-        uenTextFieldLabel.adjustsFontSizeToFitWidth = true
-        
-        //Label Text Field Dimensions And Co-Ordinates
-        uenTextFieldLabel.frame = CGRect(x: CGFloat( (20 / 414) * screenWidth), y: CGFloat( (370 / 896) * screenHeight), width: CGFloat( (140 / 414) * screenWidth), height: CGFloat( (60 / 896) * screenHeight))
-        
-        //Label Text Field Background / Border Attributes
-        uenTextFieldLabel.layer.borderWidth = 0
-        uenTextFieldLabel.backgroundColor = UIColor.white
-        
-        return uenTextFieldLabel
-        
-    }
-    
-    
-    func generateCompanyNameTextField() -> UITextField {
-
-        let companyNameTextField = UITextField()
-        
-        //Text Field Text Features
-        companyNameTextField.placeholder = "E.g. Qryptal"
-        companyNameTextField.textAlignment = .center
-        companyNameTextField.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (33 / 896) * screenHeight ))
-        companyNameTextField.textColor = UIColor.black
-        companyNameTextField.adjustsFontSizeToFitWidth = true
-        
-        //Text Field Dimensions And Co-Ordinates
-        companyNameTextField.frame = CGRect(x: CGFloat( (170 / 414) * screenWidth), y: CGFloat( (230 / 896) * screenHeight), width: CGFloat( (234 / 414) * screenWidth), height: CGFloat( (60 / 896) * screenHeight))
-        
-        //Text Field Background / Border Attributes
-        companyNameTextField.layer.borderWidth = 2
-        companyNameTextField.backgroundColor = UIColor.white
-        
-        return companyNameTextField
-        
-    }
-    
-    func generateUENTextField() -> UITextField {
-
-        let uenTextField = UITextField()
-        
-        //Text Field Text Features
-        uenTextField.placeholder = "E.g. 53222036J"
-        uenTextField.textAlignment = .center
-        uenTextField.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (33 / 896) * screenHeight ))
-        uenTextField.textColor = UIColor.black
-        uenTextField.adjustsFontSizeToFitWidth = true
-        
-        //Text Field Dimensions And Co-Ordinates
-        uenTextField.frame = CGRect(x: CGFloat( (170 / 414) * screenWidth), y: CGFloat( (370 / 896) * screenHeight), width: CGFloat( (234 / 414) * screenWidth), height: CGFloat( (60 / 896) * screenHeight))
-        
-        //Text Field Background / Border Attributes
-        uenTextField.layer.borderWidth = 2
-        uenTextField.backgroundColor = UIColor.white
-        
-        
-        return uenTextField
-        
-    }
-    
-    
-    //Alert Which Is Called When The User Has Exceeded The Reference Number Character Limit
-    func cannotExceedCompanyNameCharacterLimit() {
-        
-        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number allowed is 15", preferredStyle: .alert)
+        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
         
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
         
-        //Removes The Alert Automatically After A Deadline Of 20 Seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
-            ac.dismiss(animated: true, completion: nil)
-            self.viewWillAppear(true)
-        }
-        
-    }
-    
-    //Alert Which Is Called When The User Has Exceeded The Transaction Amount Character Limit
-    func cannotExceedUENCharacterLimit() {
-        
-        let ac = UIAlertController(title: "You Have Reached The Character Limit", message: "A Company's UEN Can Only Be 9 Or 10 Digits Long.", preferredStyle: .alert)
-        
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
-        present(ac, animated: true)
-        
-        //Removes The Alert Automatically After A Deadline Of 20 Seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
+        //Removes The Alert Automatically After A Deadline Of The Specified Seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + timeDeadline) {
             ac.dismiss(animated: true, completion: nil)
             self.viewWillAppear(true)
         }
@@ -231,6 +104,7 @@ class SettingsViewController: UIViewController {
 }
 
 
+
 extension SettingsViewController : UITextFieldDelegate {
     
     
@@ -238,12 +112,12 @@ extension SettingsViewController : UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         //Removes The Cursor & Keyboard When The User Presses Return
-        makeCompanyNameTextField?.endEditing(true)
-        makeUENTextField?.endEditing(true)
+        companyNameTextField?.endEditing(true)
+        uenTextField?.endEditing(true)
         
         //Stores The UEN & Company Name In User Defaults
-        UserDefaults.standard.set(makeCompanyNameTextField?.text, forKey: "Company_Name_Text")
-        UserDefaults.standard.set(makeUENTextField?.text, forKey: "UEN_Text")
+        UserDefaults.standard.set(companyNameTextField?.text, forKey: "Company_Name_Text")
+        UserDefaults.standard.set(uenTextField?.text, forKey: "UEN_Text")
         
         return true
         
@@ -256,30 +130,32 @@ extension SettingsViewController : UITextFieldDelegate {
 
         switch textField {
 
-        case makeCompanyNameTextField:
+        case companyNameTextField:
 
-            if let companyNameText = makeCompanyNameTextField?.text {
+            if let companyNameText = companyNameTextField?.text {
 
                 let currentCompanyNameText = companyNameText + string
 
                 if currentCompanyNameText.count > 15 {
 
-                    cannotExceedCompanyNameCharacterLimit()
+                    callAlert(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number allowed is 15", timeDeadline: 20)
                     return false
 
                 }
 
             }
 
-        case makeUENTextField:
+        case uenTextField:
 
-            if let uenText = makeUENTextField?.text {
+            if let uenText = uenTextField?.text {
 
                 let currentUENText = uenText + string
 
                 if currentUENText.count > 10 {
-                    cannotExceedUENCharacterLimit()
+                    
+                    callAlert(title: "You Have Reached The Character Limit", message: "A Company's UEN Can Only Be 9 Or 10 Digits Long.", timeDeadline: 20)
                     return false
+                    
                 }
 
             }

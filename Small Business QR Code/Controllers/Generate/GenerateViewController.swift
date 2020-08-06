@@ -23,9 +23,9 @@ class GenerateViewController: UIViewController {
     
     
     //Initializing Screen UI Components
-    var makeTransactionAmountTextField : UITextField?
-    var makeReferenceNumberTextField : UITextField?
-    var makeExpiryDateTextField : UITextField?
+    var transactionAmountTextField : UITextField?
+    var referenceNumberTextField : UITextField?
+    var expiryDateTextField : UITextField?
     
     var makeExpiryDateDatePicker : UIDatePicker?
 
@@ -43,27 +43,30 @@ class GenerateViewController: UIViewController {
         
         
         //Adds The Reference Number, Transaction Amount And Expiry Date Labels
-        let makeTransactionAmountTextFieldLabel = generateTransactionAmountTextFieldLabel()
-        let makeReferenceNumberTextFieldLabel = generateReferenceNumberTextFieldLabel()
-        let makeExpiryDateTextFieldLabel = generateExpiryDateTextFieldLabel()
+        let transactionAmountTextFieldLabel = miscFunctions.getTextFieldLabel(text: "Amount ($)", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 130, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
+        let referenceNumberTextFieldLabel = miscFunctions.getTextFieldLabel(text: "Ref No", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 190, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
+        let expiryDateTextFieldLabel = miscFunctions.getTextFieldLabel(text: "Exp Date", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 250, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
         
-        view.addSubview(makeTransactionAmountTextFieldLabel)
-        view.addSubview(makeReferenceNumberTextFieldLabel)
-        view.addSubview(makeExpiryDateTextFieldLabel)
+        view.addSubview(transactionAmountTextFieldLabel)
+        view.addSubview(referenceNumberTextFieldLabel)
+        view.addSubview(expiryDateTextFieldLabel)
         
         
         //Adds The Reference Number, Transaction Amount And Expiry Date Text Fields To The View
-        makeTransactionAmountTextField = generateTransactionAmountTextField()
-        makeReferenceNumberTextField = generateReferenceNumberTextField()
-        makeExpiryDateTextField = generateExpiryDateTextField()
+        transactionAmountTextField = miscFunctions.getTextField(placeholderText: "E.g. 100.11", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 150, frameY: 130, frameWidth: 234, frameHeight: 40, cornerRadius: 20, borderWidth: 2, backgroundColor: .white, keyboardType: .decimalPad)
         
-        makeTransactionAmountTextField!.delegate = self
-        makeReferenceNumberTextField!.delegate = self
-        makeExpiryDateTextField!.delegate = self
+        referenceNumberTextField = miscFunctions.getTextField(placeholderText: "E.g. Mr. Lee Bill", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 150, frameY: 190, frameWidth: 234, frameHeight: 40, cornerRadius: 20, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
         
-        view.addSubview(makeTransactionAmountTextField!)
-        view.addSubview(makeReferenceNumberTextField!)
-        view.addSubview(makeExpiryDateTextField!)
+        expiryDateTextField = miscFunctions.getTextField(placeholderText: "Pick Date (Optional)", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 150, frameY: 250, frameWidth: 234, frameHeight: 40, cornerRadius: 20, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
+        
+        transactionAmountTextField!.delegate = self
+        referenceNumberTextField!.delegate = self
+        expiryDateTextField!.delegate = self
+        
+        view.addSubview(transactionAmountTextField!)
+        view.addSubview(referenceNumberTextField!)
+        view.addSubview(expiryDateTextField!)
+        
         
         //Adds The Make QR Code Button To The View
         makeQRCodeButton = generateQRCodeButton()
@@ -76,7 +79,7 @@ class GenerateViewController: UIViewController {
         expiryDateDatePicker.datePickerMode = .date
         expiryDateDatePicker.addTarget(self, action: #selector(GenerateViewController.dateChanged(datePicker:)), for: .valueChanged)
         
-        makeExpiryDateTextField?.inputView = expiryDateDatePicker
+        expiryDateTextField?.inputView = expiryDateDatePicker
 
         
         //Adds the Tap Gesture Where The User Can Tap Elsewhere On The Screen To Dismiss The Editor (Such As A Keyboard Or A Date Picker)
@@ -86,184 +89,6 @@ class GenerateViewController: UIViewController {
         
     }
     
-    
-    
-    //When The User Taps On The Screen, The Editor (Such As A Keyboard Or A Date Picker) Is Dismissed
-    @objc func viewTapped(gestureRecognizer : UITapGestureRecognizer) {
-    
-        //The If Statement Below Checks If The Text Entered In The Transaction Amount Text Field Is A Number And If It Is, It Automatically Adds 2 Decimal Places To The Number, Even If It Is An Integer Or Has 1 Decimal Place. If It Is Not A Number, The Keyboard Is Not Dismissed And The User Is Prompted To Enter A Number
-        if makeTransactionAmountTextField?.isEditing == true &&  makeTransactionAmountTextField?.text != Optional("") {
-            
-            if let amount = Double((makeTransactionAmountTextField?.text)!) {
-                
-                //Since The Maximum Number Of Characters Allowed Under The Pay Now QR Code Format Is 13, The Lines Below Prevents the User From Inputting An Integer With 11-13 Characters And Then A .00 Is Added Which Gives 16 Characters Which is More Than The Maximum
-                //The line below contains the number 1000000000000 which has 11 digits
-                if amount < 10000000000 {
-                    makeTransactionAmountTextField?.text = String(format: "%.2f", arguments: [amount])
-                    view.endEditing(true)
-                } else {
-                    callAlert(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number of characters allowed is 13 including the decimal point.", timeDeadline: 20)
-                    view.endEditing(false)
-                }
-                
-                
-            } else {
-            
-                callAlert(title: "Amount Entered Is Not A Number", message: "The Transaction Amount Has To Be A Number Like 99.99 or 99", timeDeadline: 15)
-                view.endEditing(false)
-                
-            }
-
-        } else {
-            //The Line Below Dismisses Editing For All Other Instances Excluding The Transaction Amount Text Field (So For The Expiry Date Or Reference Number Text Field etc.)
-            view.endEditing(true)
-        }
-        
-    }
-    
-    
-    @objc func dateChanged(datePicker : UIDatePicker) {
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM/yyyy"
-        
-        makeExpiryDateTextField?.text = dateFormatter.string(from: datePicker.date)
-        
-    }
-    
-    
-    
-    func generateTransactionAmountTextFieldLabel() -> UILabel {
-        
-        let transactionAmountTextFieldLabel = UILabel()
-        
-        //Label Text Features
-        transactionAmountTextFieldLabel.text = "Amount ($)"
-        transactionAmountTextFieldLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
-        transactionAmountTextFieldLabel.textColor = UIColor.black
-        transactionAmountTextFieldLabel.adjustsFontSizeToFitWidth = true
-        
-        //Label Text Field Dimensions And Co-Ordinates
-        transactionAmountTextFieldLabel.frame = CGRect(x: CGFloat( (30 / 414) * screenWidth), y: CGFloat( (130 / 896) * screenHeight), width: CGFloat( (120 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
-        
-        //Label Text Field Background / Border Attributes
-        transactionAmountTextFieldLabel.backgroundColor = UIColor.white
-        
-        return transactionAmountTextFieldLabel
-        
-    }
-    
-    func generateReferenceNumberTextFieldLabel() -> UILabel {
-        
-        let referenceNumberTextFieldLabel = UILabel()
-        
-        //Label Text Features
-        referenceNumberTextFieldLabel.text = "Ref No"
-        referenceNumberTextFieldLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
-        referenceNumberTextFieldLabel.textColor = UIColor.black
-        referenceNumberTextFieldLabel.adjustsFontSizeToFitWidth = true
-        
-        //Label Text Field Dimensions And Co-Ordinates
-        referenceNumberTextFieldLabel.frame = CGRect(x: CGFloat( (30 / 414) * screenWidth), y: CGFloat( (190 / 896) * screenHeight), width: CGFloat( (120 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
-        
-        //Label Text Field Background / Border Attributes
-        referenceNumberTextFieldLabel.backgroundColor = UIColor.white
-        
-        return referenceNumberTextFieldLabel
-        
-    }
-    
-    func generateExpiryDateTextFieldLabel() -> UILabel {
-        
-        let expiryDateTextFieldLabel = UILabel()
-        
-        //Label Text Features
-        expiryDateTextFieldLabel.text = "Exp Date"
-        expiryDateTextFieldLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
-        expiryDateTextFieldLabel.textColor = UIColor.black
-        expiryDateTextFieldLabel.adjustsFontSizeToFitWidth = true
-        
-        //Label Text Field Dimensions And Co-Ordinates
-        expiryDateTextFieldLabel.frame = CGRect(x: CGFloat( (30 / 414) * screenWidth), y: CGFloat( (250 / 896) * screenHeight), width: CGFloat( (120 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
-        
-        //Label Text Field Background / Border Attributes
-        expiryDateTextFieldLabel.backgroundColor = UIColor.white
-        
-        return expiryDateTextFieldLabel
-        
-    }
-    
-    
-    func generateTransactionAmountTextField() -> UITextField {
-
-        let transactionAmountTextField = UITextField()
-        
-        //Text Field Text Features
-        transactionAmountTextField.placeholder = "E.g. 100.11"
-        transactionAmountTextField.textAlignment = .center
-        transactionAmountTextField.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
-        transactionAmountTextField.textColor = UIColor.black
-        transactionAmountTextField.adjustsFontSizeToFitWidth = true
-        
-        //Text Field Dimensions And Co-Ordinates
-        transactionAmountTextField.frame = CGRect(x: CGFloat( (150 / 414) * screenWidth), y: CGFloat( (130 / 896) * screenHeight), width: CGFloat( (234 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
-        
-        //Text Field Background / Border Attributes
-        transactionAmountTextField.layer.borderWidth = 2
-        transactionAmountTextField.backgroundColor = UIColor.white
-        
-        //Keyboard Which When Toggled Only Shows Numbers And A Decimal Point
-        transactionAmountTextField.keyboardType = .decimalPad
-        
-        return transactionAmountTextField
-        
-    }
-    
-    func generateReferenceNumberTextField() -> UITextField {
-
-        let referenceNumberTextField = UITextField()
-        
-        //Text Field Text Features
-        referenceNumberTextField.placeholder = "E.g. Mr. Lee Bill"
-        referenceNumberTextField.textAlignment = .center
-        referenceNumberTextField.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
-        referenceNumberTextField.textColor = UIColor.black
-        referenceNumberTextField.adjustsFontSizeToFitWidth = true
-        
-        //Text Field Dimensions And Co-Ordinates
-        referenceNumberTextField.frame = CGRect(x: CGFloat( (150 / 414) * screenWidth), y: CGFloat( (190 / 896) * screenHeight), width: CGFloat( (234 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
-        
-        //Text Field Background / Border Attributes
-        referenceNumberTextField.layer.borderWidth = 2
-        referenceNumberTextField.backgroundColor = UIColor.white
-        
-        
-        return referenceNumberTextField
-        
-    }
-    
-    func generateExpiryDateTextField() -> UITextField {
-
-        let expiryDateTextField = UITextField()
-        
-        //Text Field Text Features
-        expiryDateTextField.placeholder = "Pick Date (Optional)"
-        expiryDateTextField.textAlignment = .center
-        expiryDateTextField.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
-        expiryDateTextField.textColor = UIColor.black
-        expiryDateTextField.adjustsFontSizeToFitWidth = true
-        
-        //Text Field Dimensions And Co-Ordinates
-        expiryDateTextField.frame = CGRect(x: CGFloat( (150 / 414) * screenWidth), y: CGFloat( (250 / 896) * screenHeight), width: CGFloat( (234 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
-        
-        //Text Field Background / Border Attributes
-        expiryDateTextField.layer.borderWidth = 2
-        expiryDateTextField.backgroundColor = UIColor.white
-        
-        
-        return expiryDateTextField
-        
-    }
     
     
     //Creates A Button Which When Clicked On Generates The QR Code
@@ -276,13 +101,11 @@ class GenerateViewController: UIViewController {
         makeQRCodeButton.titleLabel?.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (32 / 896) * screenHeight ))
         makeQRCodeButton.titleLabel?.adjustsFontSizeToFitWidth = true
         
-        //Button Dimensions And Co-Ordinates
-        makeQRCodeButton.frame = CGRect( x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (330 / 896) * screenHeight), width: CGFloat( (334 / 414) * screenWidth), height: CGFloat( (60 / 896) * screenHeight) )
-        
         //Button Frame Attributes
+        makeQRCodeButton.frame = CGRect( x: CGFloat( (40 / 414) * screenWidth), y: CGFloat( (330 / 896) * screenHeight), width: CGFloat( (334 / 414) * screenWidth), height: CGFloat( (60 / 896) * screenHeight) )
         makeQRCodeButton.layer.cornerRadius = CGFloat( (25 / 896) * screenHeight)
-
         
+        //Button Background Attributes
         makeQRCodeButton.backgroundColor = .systemBlue
         
         makeQRCodeButton.addTarget(self, action:#selector(self.generateQRCodeButtonClicked), for: .touchUpInside)
@@ -308,11 +131,11 @@ class GenerateViewController: UIViewController {
         if companyNameString != Optional("") && uenString != Optional("") {
             
             
-            if makeTransactionAmountTextField?.text != Optional("") && makeReferenceNumberTextField?.text != Optional("") {
+            if transactionAmountTextField?.text != Optional("") && referenceNumberTextField?.text != Optional("") {
                 
                 //Constats To Store The Transaction Amount As Well As The Reference Number
-                let transactionAmount = (makeTransactionAmountTextField?.text)!
-                let referenceNumber = (makeReferenceNumberTextField?.text)!
+                let transactionAmount = (transactionAmountTextField?.text)!
+                let referenceNumber = (referenceNumberTextField?.text)!
                 
                 
                 //For Testing Purposes : Qryptal UEN Is 201101550Z
@@ -321,8 +144,8 @@ class GenerateViewController: UIViewController {
                 let finalUENString = (uenString)!
                 
                 var format_YYYY_DD_MM_Date : String
-                if makeExpiryDateTextField?.text != Optional("") {
-                    format_YYYY_DD_MM_Date = miscFunctions.getFormattedDate(dateText: makeExpiryDateTextField?.text)
+                if expiryDateTextField?.text != Optional("") {
+                    format_YYYY_DD_MM_Date = miscFunctions.getFormattedDate(dateText: expiryDateTextField?.text)
                 } else {
                     format_YYYY_DD_MM_Date = "0"
                 }
@@ -371,6 +194,50 @@ class GenerateViewController: UIViewController {
     }
     
     
+    //When The User Taps On The Screen, The Editor (Such As A Keyboard Or A Date Picker) Is Dismissed
+    @objc func viewTapped(gestureRecognizer : UITapGestureRecognizer) {
+    
+        //The If Statement Below Checks If The Text Entered In The Transaction Amount Text Field Is A Number And If It Is, It Automatically Adds 2 Decimal Places To The Number, Even If It Is An Integer Or Has 1 Decimal Place. If It Is Not A Number, The Keyboard Is Not Dismissed And The User Is Prompted To Enter A Number
+        if transactionAmountTextField?.isEditing == true &&  transactionAmountTextField?.text != Optional("") {
+            
+            if let amount = Double((transactionAmountTextField?.text)!) {
+                
+                //Since The Maximum Number Of Characters Allowed Under The Pay Now QR Code Format Is 13, The Lines Below Prevents the User From Inputting An Integer With 11-13 Characters And Then A .00 Is Added Which Gives 16 Characters Which is More Than The Maximum
+                //The line below contains the number 1000000000000 which has 11 digits
+                if amount < 10000000000 {
+                    transactionAmountTextField?.text = String(format: "%.2f", arguments: [amount])
+                    view.endEditing(true)
+                } else {
+                    callAlert(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number of characters allowed is 13 including the decimal point.", timeDeadline: 20)
+                    view.endEditing(false)
+                }
+                
+                
+            } else {
+            
+                callAlert(title: "Amount Entered Is Not A Number", message: "The Transaction Amount Has To Be A Number Like 99.99 or 99", timeDeadline: 15)
+                view.endEditing(false)
+                
+            }
+
+        } else {
+            //The Line Below Dismisses Editing For All Other Instances Excluding The Transaction Amount Text Field (So For The Expiry Date Or Reference Number Text Field etc.)
+            view.endEditing(true)
+        }
+        
+    }
+    
+    
+    @objc func dateChanged(datePicker : UIDatePicker) {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM/yyyy"
+        
+        expiryDateTextField?.text = dateFormatter.string(from: datePicker.date)
+        
+    }
+    
+    
     func callAlert(title : String, message : String, timeDeadline : Double) {
         
         let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -387,19 +254,18 @@ class GenerateViewController: UIViewController {
     }
     
     
-    
     @IBAction func resetPressed(_ sender: UIBarButtonItem) {
-        makeTransactionAmountTextField?.text = ""
-        makeReferenceNumberTextField?.text = ""
-        makeExpiryDateTextField?.text = ""
+        transactionAmountTextField?.text = ""
+        referenceNumberTextField?.text = ""
+        expiryDateTextField?.text = ""
         self.actualImageView?.removeFromSuperview()
     }
     
     
     @IBAction func refreshIconPressed(_ sender: UIBarButtonItem) {
-        makeTransactionAmountTextField?.text = ""
-        makeReferenceNumberTextField?.text = ""
-        makeExpiryDateTextField?.text = ""
+        transactionAmountTextField?.text = ""
+        referenceNumberTextField?.text = ""
+        expiryDateTextField?.text = ""
         self.actualImageView?.removeFromSuperview()
     }
     
@@ -427,9 +293,9 @@ extension GenerateViewController : UITextFieldDelegate {
     
     //Function Which Removes The Cursor & Keyboard When The User Presses Return
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        makeTransactionAmountTextField?.endEditing(true)
-        makeReferenceNumberTextField?.endEditing(true)
-        makeExpiryDateTextField?.endEditing(true)
+        transactionAmountTextField?.endEditing(true)
+        referenceNumberTextField?.endEditing(true)
+        expiryDateTextField?.endEditing(true)
         return true
     }
     
@@ -445,7 +311,7 @@ extension GenerateViewController : UITextFieldDelegate {
 
 
         //Check the specific textField
-        if textField == makeTransactionAmountTextField {
+        if textField == transactionAmountTextField {
             
             let textArray = resultString.components(separatedBy: ".")
             
@@ -473,9 +339,9 @@ extension GenerateViewController : UITextFieldDelegate {
 
         switch textField {
 
-        case makeTransactionAmountTextField:
+        case transactionAmountTextField:
 
-            if let transactionAmountText = makeTransactionAmountTextField?.text {
+            if let transactionAmountText = transactionAmountTextField?.text {
 
                 let currentTransactionAmountText = transactionAmountText + string
 
@@ -488,9 +354,9 @@ extension GenerateViewController : UITextFieldDelegate {
 
             }
 
-        case makeReferenceNumberTextField:
+        case referenceNumberTextField:
 
-            if let referenceNumberText = makeReferenceNumberTextField?.text {
+            if let referenceNumberText = referenceNumberTextField?.text {
 
                 let currentReferenceNumberText = referenceNumberText + string
 
@@ -515,9 +381,9 @@ extension GenerateViewController : UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         
         //The Line Below Makes Sure That 2 Decimal Places Are Added In The Transaction Amount Tax Field Even If The User Taps On Another Text Field To Exit The Transaction Text Field And Select The Other Text Field
-        if let amount = Double((makeTransactionAmountTextField?.text)!) {
+        if let amount = Double((transactionAmountTextField?.text)!) {
                 if amount < 10000000000 {
-                    makeTransactionAmountTextField?.text = String(format: "%.2f", arguments: [amount])
+                    transactionAmountTextField?.text = String(format: "%.2f", arguments: [amount])
                 }
         }
       

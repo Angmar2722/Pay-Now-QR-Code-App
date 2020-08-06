@@ -16,6 +16,8 @@ struct MiscFunctions {
     let screenHeight = UIScreen.main.bounds.height
     let screenArea = UIScreen.main.bounds.width * UIScreen.main.bounds.height
     
+    
+    
     //Function Which Returns The Correct Formatted Date For The Pay Now QR String (YYYYMMDD)
     func getFormattedDate(dateText : String?) -> String {
                 
@@ -33,6 +35,58 @@ struct MiscFunctions {
         
     }
     
+    
+    
+    //Function Which Returns A Text Field Label
+    func getTextFieldLabel(text : String, textAlignment : NSTextAlignment, fontName : String, fontSize : CGFloat, textColor : UIColor, numberOfLines : Int, adjustsFontSizeToFitWidth : Bool, frameX : CGFloat, frameY : CGFloat, frameWidth : CGFloat, frameHeight : CGFloat, backgroundColor : UIColor) -> UILabel {
+        
+        let textFieldLabel = UILabel()
+        
+        //Label Text Features
+        textFieldLabel.text = text
+        textFieldLabel.textAlignment = textAlignment
+        textFieldLabel.font = UIFont(name: fontName, size: CGFloat( (fontSize / 896) * screenHeight ))
+        textFieldLabel.textColor = textColor
+        textFieldLabel.numberOfLines = numberOfLines
+        textFieldLabel.adjustsFontSizeToFitWidth = adjustsFontSizeToFitWidth
+        
+        //Text Field Label Frame Attributes
+        textFieldLabel.frame = CGRect(x: CGFloat( (frameX / 414) * screenWidth), y: CGFloat( (frameY / 896) * screenHeight), width: CGFloat( (frameWidth / 414) * screenWidth), height: CGFloat( (frameHeight / 896) * screenHeight))
+        
+        //Label Text Field Background / Border Attributes
+        textFieldLabel.backgroundColor = backgroundColor
+        
+        return textFieldLabel
+        
+    }
+    
+    
+    //Function Which Returns A Text Field
+    func getTextField(placeholderText : String, textAlignment : NSTextAlignment, fontName : String, fontSize : CGFloat, textColor : UIColor, adjustsFontSizeToFitWidth : Bool, frameX : CGFloat, frameY : CGFloat, frameWidth : CGFloat, frameHeight : CGFloat, cornerRadius : CGFloat, borderWidth : CGFloat, backgroundColor : UIColor, keyboardType : UIKeyboardType) -> UITextField {
+        
+        let textField = UITextField()
+        
+        //Text Field Text Features
+        textField.placeholder = placeholderText
+        textField.textAlignment = textAlignment
+        textField.font = UIFont(name: fontName, size: CGFloat( (fontSize / 896) * screenHeight ))
+        textField.textColor = textColor
+        textField.adjustsFontSizeToFitWidth = adjustsFontSizeToFitWidth
+        
+        //Text Field Frame Attributes
+        textField.frame = CGRect(x: CGFloat( (frameX / 414) * screenWidth), y: CGFloat( (frameY / 896) * screenHeight), width: CGFloat( (frameWidth / 414) * screenWidth), height: CGFloat( (frameHeight / 896) * screenHeight))
+        textField.layer.cornerRadius = CGFloat( (cornerRadius / 896) * screenHeight)
+        
+        //Text Field Background / Border Attributes
+        textField.layer.borderWidth = borderWidth
+        textField.backgroundColor = backgroundColor
+        
+        //Keyboard Features
+        textField.keyboardType = keyboardType
+
+        return textField
+        
+    }
     
     
     //Function Which Generates The QR Code
