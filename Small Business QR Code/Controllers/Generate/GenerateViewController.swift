@@ -23,6 +23,10 @@ class GenerateViewController: UIViewController {
     
     
     //Initializing Screen UI Components
+    var transactionAmountTextFieldLabel : UILabel?
+    var referenceNumberTextFieldLabel : UILabel?
+    var expiryDateTextFieldLabel : UILabel?
+    
     var transactionAmountTextField : UITextField?
     var referenceNumberTextField : UITextField?
     var expiryDateTextField : UITextField?
@@ -35,29 +39,57 @@ class GenerateViewController: UIViewController {
     var payNowLogoImageView : UIImageView?
     
     
+    //Initializing Screen Mode Variables
+    var isInDarkMode : Bool?
+    var isInLightMode : Bool?
+    //Monitors If The Screen Mode Changed (Light & Dark Mode)
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+            
+        if UIScreen.main.traitCollection.userInterfaceStyle == .dark {
+            isInDarkMode = true
+            isInLightMode = false
+            viewDidLoad()
+        } else {
+            isInLightMode = true
+            isInDarkMode = false
+            viewDidLoad()
+        }
+
+    }
+    
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        //Initializing Accompanying Model Files && Screen Mode (Dark Or Light)
+        if UIScreen.main.traitCollection.userInterfaceStyle == .dark {
+            isInDarkMode = true
+            isInLightMode = false
+        } else if UIScreen.main.traitCollection.userInterfaceStyle == .light {
+            isInLightMode = true
+            isInDarkMode = false
+        }
+        let ui_Elements = UI_Elements(darkMode: isInDarkMode!, lightMode: isInLightMode!)
         
         //Adds The Reference Number, Transaction Amount And Expiry Date Labels
-        let transactionAmountTextFieldLabel = miscFunctions.getTextFieldLabel(text: "Amount ($)", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 130, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
-        let referenceNumberTextFieldLabel = miscFunctions.getTextFieldLabel(text: "Ref No", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 190, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
-        let expiryDateTextFieldLabel = miscFunctions.getTextFieldLabel(text: "Exp Date", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 250, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
+        transactionAmountTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Amount ($)", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 130, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
+        referenceNumberTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Ref No", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 190, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
+        expiryDateTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Exp Date", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 250, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
         
-        view.addSubview(transactionAmountTextFieldLabel)
-        view.addSubview(referenceNumberTextFieldLabel)
-        view.addSubview(expiryDateTextFieldLabel)
+        view.addSubview(transactionAmountTextFieldLabel!)
+        view.addSubview(referenceNumberTextFieldLabel!)
+        view.addSubview(expiryDateTextFieldLabel!)
         
         
         //Adds The Reference Number, Transaction Amount And Expiry Date Text Fields To The View
-        transactionAmountTextField = miscFunctions.getTextField(placeholderText: "E.g. 100.11", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 150, frameY: 130, frameWidth: 234, frameHeight: 40, cornerRadius: 20, borderWidth: 2, backgroundColor: .white, keyboardType: .decimalPad)
+        transactionAmountTextField = ui_Elements.getTextField(placeholderText: "E.g. 100.11", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 150, frameY: 130, frameWidth: 234, frameHeight: 40, cornerRadius: 20, borderWidth: 2, backgroundColor: .white, keyboardType: .decimalPad)
         
-        referenceNumberTextField = miscFunctions.getTextField(placeholderText: "E.g. Mr. Lee Bill", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 150, frameY: 190, frameWidth: 234, frameHeight: 40, cornerRadius: 20, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
+        referenceNumberTextField = ui_Elements.getTextField(placeholderText: "E.g. Mr. Lee Bill", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 150, frameY: 190, frameWidth: 234, frameHeight: 40, cornerRadius: 20, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
         
-        expiryDateTextField = miscFunctions.getTextField(placeholderText: "Pick Date (Optional)", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 150, frameY: 250, frameWidth: 234, frameHeight: 40, cornerRadius: 20, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
+        expiryDateTextField = ui_Elements.getTextField(placeholderText: "Pick Date (Optional)", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 150, frameY: 250, frameWidth: 234, frameHeight: 40, cornerRadius: 20, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
         
         transactionAmountTextField!.delegate = self
         referenceNumberTextField!.delegate = self

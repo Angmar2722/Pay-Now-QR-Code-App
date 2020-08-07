@@ -20,32 +20,64 @@ class SettingsViewController: UIViewController {
     let screenArea = UIScreen.main.bounds.width * UIScreen.main.bounds.height
     
     //Initializing Screen UI Components
+    var settingsTextLabel : UILabel?
+    var companyNameTextFieldLabel : UILabel?
+    var uenTextFieldLabel : UILabel?
+    
     var companyNameTextField : UITextField?
     var uenTextField : UITextField?
+    
+    
+    //Initializing Screen Mode Variables
+    var isInDarkMode : Bool?
+    var isInLightMode : Bool?
+    //Monitors If The Screen Mode Changed (Light & Dark Mode)
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+            
+        if UIScreen.main.traitCollection.userInterfaceStyle == .dark {
+            isInDarkMode = true
+            isInLightMode = false
+            viewDidLoad()
+        } else {
+            isInLightMode = true
+            isInDarkMode = false
+            viewDidLoad()
+        }
 
+    }
     
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        //Initializing Accompanying Model Files && Screen Mode (Dark Or Light)
+        if UIScreen.main.traitCollection.userInterfaceStyle == .dark {
+            isInDarkMode = true
+            isInLightMode = false
+        } else if UIScreen.main.traitCollection.userInterfaceStyle == .light {
+            isInLightMode = true
+            isInDarkMode = false
+        }
+        let ui_Elements = UI_Elements(darkMode: isInDarkMode!, lightMode: isInLightMode!)
         
         //Adds The Settings, Reference Number, Transaction Amount And Expiry Date Labels
-        let settingsTextLabel = miscFunctions.getTextFieldLabel(text: "Settings", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 55, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 0, frameY: 80, frameWidth: 414, frameHeight: 80, backgroundColor: .white)
+        settingsTextLabel = ui_Elements.getTextFieldLabel(text: "Settings", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 55, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 0, frameY: 80, frameWidth: 414, frameHeight: 80, backgroundColor: .white)
         
-        let companyNameTextFieldLabel = miscFunctions.getTextFieldLabel(text: "Company Name", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 225, frameWidth: 140, frameHeight: 80, backgroundColor: .white)
+        companyNameTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Company Name", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 225, frameWidth: 140, frameHeight: 80, backgroundColor: .white)
         
-        let uenTextFieldLabel = miscFunctions.getTextFieldLabel(text: "UEN", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 370, frameWidth: 140, frameHeight: 60, backgroundColor: .white)
+        uenTextFieldLabel = ui_Elements.getTextFieldLabel(text: "UEN", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 370, frameWidth: 140, frameHeight: 60, backgroundColor: .white)
         
-        view.addSubview(settingsTextLabel)
-        view.addSubview(companyNameTextFieldLabel)
-        view.addSubview(uenTextFieldLabel)
+        view.addSubview(settingsTextLabel!)
+        view.addSubview(companyNameTextFieldLabel!)
+        view.addSubview(uenTextFieldLabel!)
         
         
         //Adds The Reference Number, Transaction Amount And Expiry Date Text Fields To The View
-        companyNameTextField = miscFunctions.getTextField(placeholderText: "E.g. Qryptal", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 170, frameY: 230, frameWidth: 234, frameHeight: 60, cornerRadius: 25, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
+        companyNameTextField = ui_Elements.getTextField(placeholderText: "E.g. Qryptal", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 170, frameY: 230, frameWidth: 234, frameHeight: 60, cornerRadius: 25, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
         
-        uenTextField = miscFunctions.getTextField(placeholderText: "E.g. 53222036J", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 170, frameY: 370, frameWidth: 234, frameHeight: 60, cornerRadius: 25, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
+        uenTextField = ui_Elements.getTextField(placeholderText: "E.g. 53222036J", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 170, frameY: 370, frameWidth: 234, frameHeight: 60, cornerRadius: 25, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
         
         companyNameTextField!.delegate = self
         uenTextField!.delegate = self
@@ -99,7 +131,7 @@ class SettingsViewController: UIViewController {
         }
         
     }
-   
+    
 
 }
 
