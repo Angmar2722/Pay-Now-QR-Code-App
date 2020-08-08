@@ -75,9 +75,9 @@ class GenerateViewController: UIViewController {
         let ui_Elements = UI_Elements(darkMode: isInDarkMode!, lightMode: isInLightMode!)
         
         //Adds The Reference Number, Transaction Amount And Expiry Date Labels
-        transactionAmountTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Amount ($)", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 130, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
-        referenceNumberTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Ref No", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 190, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
-        expiryDateTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Exp Date", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 250, frameWidth: 120, frameHeight: 40, backgroundColor: .white)
+        transactionAmountTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Amount ($)", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 130, frameWidth: 120, frameHeight: 40, backgroundColor: .white, borderWidth: 0.0)
+        referenceNumberTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Ref No", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 190, frameWidth: 120, frameHeight: 40, backgroundColor: .white, borderWidth: 0.0)
+        expiryDateTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Exp Date", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 250, frameWidth: 120, frameHeight: 40, backgroundColor: .white, borderWidth: 0.0)
         
         view.addSubview(transactionAmountTextFieldLabel!)
         view.addSubview(referenceNumberTextFieldLabel!)
@@ -155,21 +155,28 @@ class GenerateViewController: UIViewController {
         //Removes Any Existing Image When The Generate Button Is Pressed
         actualImageView?.image = nil
         
-        //Fetches The Company Name & UEN From The Settings View Controller
+        //Fetches The Company Name, UEN & Whether Amount Is Editable Bool From The Settings View Controller
         let companyNameString = UserDefaults.standard.string(forKey: "Company_Name_Text")
         let uenString = UserDefaults.standard.string(forKey: "UEN_Text")
-        
+        var isEditableBool = UserDefaults.standard.bool(forKey: "isEditable")
         
         if companyNameString != Optional("") && uenString != Optional("") {
             
             
-            if transactionAmountTextField?.text != Optional("") && referenceNumberTextField?.text != Optional("") {
+            if referenceNumberTextField?.text != Optional("") {
                 
-                //Constats To Store The Transaction Amount As Well As The Reference Number
-                let transactionAmount = (transactionAmountTextField?.text)!
+                //Constats To Store The Transaction Amount & Reference Number
+                var transactionAmount : String
+                if transactionAmountTextField?.text != Optional("") {
+                    transactionAmount = (transactionAmountTextField?.text)!
+                } else {
+                    //If Amount Is Left Unfilled, The Amount Is Set As $0.00 And The Amount Is Editable Regardless Of The Settings
+                    transactionAmount = "0.00"
+                    isEditableBool = true
+                }
                 let referenceNumber = (referenceNumberTextField?.text)!
                 
-                
+
                 //For Testing Purposes : Qryptal UEN Is 201101550Z
                 //Fetches The Final Unwrapped Company Name & UEN String & Formatted Date
                 let finalCompanyNameString = (companyNameString)!
@@ -179,13 +186,12 @@ class GenerateViewController: UIViewController {
                 if expiryDateTextField?.text != Optional("") {
                     format_YYYY_DD_MM_Date = miscFunctions.getFormattedDate(dateText: expiryDateTextField?.text)
                 } else {
-                    format_YYYY_DD_MM_Date = "0"
+                    format_YYYY_DD_MM_Date = "nil"
                 }
                 
                 //Fetches The Final Pay Now QR Code String From The 'PayNowQRString' Model
-                let payNowQRString = PayNowQRString(inputUEN: "\(finalUENString)", inputExpiryDate: "\(format_YYYY_DD_MM_Date)", inputTransactionAmount: "\(transactionAmount)", inputCompanyName: "\(finalCompanyNameString)", inputReferenceNumber: "\(referenceNumber)")
-                let finalPayNowQRString = payNowQRString.getFinalPayNowQRString()
-                print(finalPayNowQRString)
+                let payNowQRString = PayNowQRString(_beneficiaryType: "2", _beneficiary: "\(finalUENString)", _beneficiaryName: "\(finalCompanyNameString)", amount: "\(transactionAmount)", reference: "\(referenceNumber)", amountIsEditable: isEditableBool, _expiryDate: "\(format_YYYY_DD_MM_Date)")
+                let finalPayNowQRString = payNowQRString.getPayNowQRString()
                 
                 //Calculating The Width And Height Of The QR Code As Well As The X Co-Ordinate Of The Image View
                 widthAndHeightOfQRCode = (85/100) * (makeQRCodeButton?.frame.width)!
@@ -211,7 +217,7 @@ class GenerateViewController: UIViewController {
                    
             } else  {
                 
-                callAlert(title: "Cannot Generate QR Code", message: "Please Make Sure That The Amount ($) And The Reference Number Field Is Filled In", timeDeadline: 20)
+                callAlert(title: "Cannot Generate QR Code", message: "Please Make Sure That The Reference Number Field Is Filled In", timeDeadline: 20)
                 
             }
             

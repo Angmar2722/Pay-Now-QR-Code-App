@@ -15,21 +15,25 @@ import Foundation
 
 struct PayNowQRString {
     
-    let UEN : String
-    let expiryDate : String?
+    let beneficiaryType : String
+    let beneficiary : String
+    let beneficiaryName : String
     let transactionAmount : String
-    let companyName : String
     let referenceNumber : String
+    let isEditable : Bool
+    let expiryDate : String?
     
     
-    init(inputUEN : String, inputExpiryDate : String?, inputTransactionAmount : String, inputCompanyName : String, inputReferenceNumber : String) {
-                
-        UEN = inputUEN
+    init(_beneficiaryType : String, _beneficiary : String, _beneficiaryName : String, amount : String, reference : String, amountIsEditable : Bool, _expiryDate : String?) {
+        
+        beneficiaryType = _beneficiaryType
+        beneficiary = _beneficiary
+        beneficiaryName = _beneficiaryName
+        transactionAmount = amount
+        referenceNumber = reference
+        isEditable = amountIsEditable
         //If The Input Expiry Date Is "0", The Expiry Date Is Not Generated
-        expiryDate = inputExpiryDate
-        transactionAmount = inputTransactionAmount
-        companyName = inputCompanyName
-        referenceNumber = inputReferenceNumber
+        expiryDate = _expiryDate
         
     }
     
@@ -66,57 +70,69 @@ struct PayNowQRString {
     var electronicFundTransferServiceString : String {
         return "\(electronicFundTransferServiceStringID)\(electronicFundTransferServiceStringCharLength)\(electronicFundTransferServiceStringValue)"
     }
+    
         
-    //Merchant Account Info Template Sub-Category : UEN Category Selected
-    let categorySelectedStringID = "01"
-    //For The Value 0 = Mobile, 1 = Unused, 2 = UEN
-    let categorySelectedStringValue = "2"
-    var  categorySelectedStringCharLength : String {
-        return "0\(categorySelectedStringValue.count)"
+    //Merchant Account Info Template Sub-Category : Beneficiary Type Selected
+    let beneficiaryTypeSelectedStringID = "01"
+    //The Value 0 = Mobile, 1 = Unused, 2 = UEN
+    var beneficiaryTypeStringValue : String {
+        return beneficiaryType
     }
-    var categorySelectedString : String {
-        return "\(categorySelectedStringID)\(categorySelectedStringCharLength)\(categorySelectedStringValue)"
+    var  beneficiaryTypeStringCharLength : String {
+        return "0\(beneficiaryTypeStringValue.count)"
     }
+    var beneficiaryTypeString : String {
+        return "\(beneficiaryTypeSelectedStringID)\(beneficiaryTypeStringCharLength)\(beneficiaryTypeStringValue)"
+    }
+    
         
     //Merchant Account Info Template Sub-Category : UEN Value (Company Unique Entity Number)
-    let uenValueStringID = "02"
-    var uenValueStringValue : String {
-        return "\(UEN)"
+    let beneficiaryValueStringID = "02"
+    var beneficiaryValueStringValue : String {
+        return beneficiary
     }
-    var uenValueStringCharLength : String {
+    var beneficiaryValueStringCharLength : String {
         
-        if uenValueStringValue.count >= 10 {
-            return "\(uenValueStringValue.count)"
-        } else if uenValueStringValue.count < 10 {
-            return "0\(uenValueStringValue.count)"
+        if beneficiaryValueStringValue.count >= 10 {
+            return "\(beneficiaryValueStringValue.count)"
+        } else if beneficiaryValueStringValue.count < 10 {
+            return "0\(beneficiaryValueStringValue.count)"
         } else {
-            return String("Failed To Return UEN Character Length")
+            return String("Failed To Return Beneficiary Value Character Length")
         }
         
     }
-    var uenValueString : String {
-        return "\(uenValueStringID)\(uenValueStringCharLength)\(uenValueStringValue)"
+    var beneficiaryValueString : String {
+        return "\(beneficiaryValueStringID)\(beneficiaryValueStringCharLength)\(beneficiaryValueStringValue)"
     }
+    
         
     //Merchant Account Info Template Sub-Category : Payment Is Or Is Not Editable
     let isPaymentEditableStringID = "03"
     //The Value 0 = Payment Not Editable, 1 = Payment Is Editable
-    let isPaymentEditableStringValue = "0"
+    var isPaymentEditableStringValue : String {
+        if isEditable == true {
+            return "1"
+        } else {
+            return "0"
+        }
+    }
     var isPaymentEditableStringCharLength : String {
         return "0\(isPaymentEditableStringValue.count)"
     }
     var isPaymentEditableString : String {
         return "\(isPaymentEditableStringID)\(isPaymentEditableStringCharLength)\(isPaymentEditableStringValue)"
     }
+    
         
     //Merchant Account Info Template Sub-Category : Expiry Date (YYYYMMDD Format) (This Is An Optional Category)
     var expiryDateString : String {
         
-        if expiryDate == "0" {
+        if expiryDate == "nil" {
             return ""
         } else {
             let expiryDateStringID = "04"
-            let expiryDateStringValue = "\(expiryDate!)"
+            let expiryDateStringValue = expiryDate!
             let expiryDateStringCharLength = "0\(expiryDateStringValue.count)"
             return "\(expiryDateStringID)\(expiryDateStringCharLength)\(expiryDateStringValue)"
         }
@@ -127,10 +143,10 @@ struct PayNowQRString {
     //Merchant Account Info Template (ID-26)
     let merchantAccountInfoTemplateStringID = "26"
     var merchantAccountInfoTemplateStringCharLength : String {
-        return String(electronicFundTransferServiceString.count + categorySelectedString.count + uenValueString.count + isPaymentEditableString.count + expiryDateString.count)
+        return String(electronicFundTransferServiceString.count + beneficiaryTypeString.count + beneficiaryValueString.count + isPaymentEditableString.count + expiryDateString.count)
     }
     var merchantAccountInfoTemplateString : String {
-        return "\(merchantAccountInfoTemplateStringID)\(merchantAccountInfoTemplateStringCharLength)\(electronicFundTransferServiceString)\(categorySelectedString)\(uenValueString)\(isPaymentEditableString)\(expiryDateString)"
+        return "\(merchantAccountInfoTemplateStringID)\(merchantAccountInfoTemplateStringCharLength)\(electronicFundTransferServiceString)\(beneficiaryTypeString)\(beneficiaryValueString)\(isPaymentEditableString)\(expiryDateString)"
     }
         
         
@@ -161,7 +177,7 @@ struct PayNowQRString {
     //The Transaction Amount In Dollars
     let transactionAmountStringID = "54"
     var transactionAmountStringValue : String {
-        return "\(transactionAmount)"
+        return transactionAmount
     }
     var transactionAmountStringCharLength : String {
         
@@ -191,23 +207,23 @@ struct PayNowQRString {
         
         
     //Company Name
-    let companyNameStringID = "59"
-    var companyNameStringValue : String {
-        return "\(companyName)"
+    let beneficiaryNameStringID = "59"
+    var beneficiaryNameStringValue : String {
+        return beneficiaryName
     }
-    var companyNameStringCharLength : String {
+    var beneficiaryNameStringCharLength : String {
         
-        if companyNameStringValue.count >= 10 {
-            return "\(companyNameStringValue.count)"
-        } else if companyNameStringValue.count < 10 {
-            return "0\(companyNameStringValue.count)"
+        if beneficiaryNameStringValue.count >= 10 {
+            return "\(beneficiaryNameStringValue.count)"
+        } else if beneficiaryNameStringValue.count < 10 {
+            return "0\(beneficiaryNameStringValue.count)"
         } else {
-            return String("Failed To Return Company Name Character Length")
+            return String("Failed To Return Beneficiary Name Character Length")
         }
         
     }
-    var companyNameString : String {
-        return "\(companyNameStringID)\(companyNameStringCharLength)\(companyNameStringValue)"
+    var beneficiaryNameString : String {
+        return "\(beneficiaryNameStringID)\(beneficiaryNameStringCharLength)\(beneficiaryNameStringValue)"
     }
         
         
@@ -233,7 +249,7 @@ struct PayNowQRString {
     //Additional Data Fields Sub-Category : Actual Bill / Reference Number
     let referenceNumberStringID = "01"
     var referenceNumberStringValue : String {
-        return "\(referenceNumber)"
+        return referenceNumber
     }
     var referenceNumberStringCharLength : String {
         
@@ -278,7 +294,7 @@ struct PayNowQRString {
         
     //PayNow QR Code String Without The CRC-16 Checksum
     var payNowQRCodeStringWithoutChecksumCRC16 : String {
-        return "\(payloadFormatIndicatorString)\(pointOfInitiationMethodString)\(merchantAccountInfoTemplateString)\(merchantCategoryCodeString)\(currencyCodeString)\(transactionAmountString)\(countryCodeString)\(companyNameString)\(merchantCityString)\(additionalDataFieldsString)\(checksumString)"
+        return "\(payloadFormatIndicatorString)\(pointOfInitiationMethodString)\(merchantAccountInfoTemplateString)\(merchantCategoryCodeString)\(currencyCodeString)\(transactionAmountString)\(countryCodeString)\(beneficiaryNameString)\(merchantCityString)\(additionalDataFieldsString)\(checksumString)"
     }
         
         
@@ -321,9 +337,8 @@ struct PayNowQRString {
         return "\(payNowQRCodeStringWithoutChecksumCRC16)\(checksum_CRC16_String)"
     }
         
-    func getFinalPayNowQRString() -> String {
+    func getPayNowQRString() -> String {
         return finalPayNowQRString
     }
     
-   
 }

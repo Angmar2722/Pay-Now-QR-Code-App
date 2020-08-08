@@ -23,6 +23,8 @@ class SettingsViewController: UIViewController {
     var settingsTextLabel : UILabel?
     var companyNameTextFieldLabel : UILabel?
     var uenTextFieldLabel : UILabel?
+    var amountIsEditableLabel : UILabel?
+    var amountIsEditableInfoLabel : UILabel?
     
     var companyNameTextField : UITextField?
     var uenTextField : UITextField?
@@ -63,27 +65,36 @@ class SettingsViewController: UIViewController {
         let ui_Elements = UI_Elements(darkMode: isInDarkMode!, lightMode: isInLightMode!)
         
         //Adds The Settings, Reference Number, Transaction Amount And Expiry Date Labels
-        settingsTextLabel = ui_Elements.getTextFieldLabel(text: "Settings", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 55, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 0, frameY: 80, frameWidth: 414, frameHeight: 80, backgroundColor: .white)
+        settingsTextLabel = ui_Elements.getTextFieldLabel(text: "Settings", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 55, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 0, frameY: 80, frameWidth: 414, frameHeight: 80, backgroundColor: .white, borderWidth: 0.0)
         
-        companyNameTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Company Name", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 225, frameWidth: 140, frameHeight: 80, backgroundColor: .white)
+        companyNameTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Company Name", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 225, frameWidth: 140, frameHeight: 80, backgroundColor: .white, borderWidth: 0.0)
         
-        uenTextFieldLabel = ui_Elements.getTextFieldLabel(text: "UEN", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 370, frameWidth: 140, frameHeight: 60, backgroundColor: .white)
+        uenTextFieldLabel = ui_Elements.getTextFieldLabel(text: "UEN", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 370, frameWidth: 140, frameHeight: 60, backgroundColor: .white, borderWidth: 0.0)
+        
+        amountIsEditableLabel = ui_Elements.getTextFieldLabel(text: "Amount Is Editable", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 490, frameWidth: 140, frameHeight: 80, backgroundColor: .white, borderWidth: 0.0)
+        
+        amountIsEditableInfoLabel = ui_Elements.getTextFieldLabel(text: "Please carefully enter your organisation details so that payments reach your account.", textAlignment: .center, fontName: "San Francisco", fontSize: 20, textColor: .black, numberOfLines: 0, adjustsFontSizeToFitWidth: true, frameX: 20, frameY: 640, frameWidth: 374, frameHeight: 60, backgroundColor: .white, borderWidth: 1)
         
         view.addSubview(settingsTextLabel!)
         view.addSubview(companyNameTextFieldLabel!)
         view.addSubview(uenTextFieldLabel!)
-        
+        view.addSubview(amountIsEditableLabel!)
+        view.addSubview(amountIsEditableInfoLabel!)
         
         //Adds The Reference Number, Transaction Amount And Expiry Date Text Fields To The View
-        companyNameTextField = ui_Elements.getTextField(placeholderText: "E.g. Qryptal", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 170, frameY: 230, frameWidth: 234, frameHeight: 60, cornerRadius: 25, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
+        companyNameTextField = ui_Elements.getTextField(placeholderText: "E.g. Matsol", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 170, frameY: 230, frameWidth: 234, frameHeight: 60, cornerRadius: 25, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
         
-        uenTextField = ui_Elements.getTextField(placeholderText: "E.g. 53222036J", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 170, frameY: 370, frameWidth: 234, frameHeight: 60, cornerRadius: 25, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
+        uenTextField = ui_Elements.getTextField(placeholderText: "E.g. 201536938K", textAlignment: .center, fontName: "AppleSDGothicNeo-Bold", fontSize: 33, textColor: .black, adjustsFontSizeToFitWidth: true, frameX: 170, frameY: 370, frameWidth: 234, frameHeight: 60, cornerRadius: 25, borderWidth: 2, backgroundColor: .white, keyboardType: .default)
         
         companyNameTextField!.delegate = self
         uenTextField!.delegate = self
         
         view.addSubview(companyNameTextField!)
         view.addSubview(uenTextField!)
+        
+        //Adds The Amount Is Editable Switch Button To The View
+        let amountIsEditableUISwitch = generateUISwtich()
+        view.addSubview(amountIsEditableUISwitch)
         
         //Adds the Tap Gesture Where The User Can Tap Elsewhere On The Screen To Dismiss The Editor (Such As A Keyboard Or A Date Picker)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(SettingsViewController.viewTapped(gestureRecognizer:)))
@@ -100,12 +111,46 @@ class SettingsViewController: UIViewController {
         }
         
         
+        //Checks The Last Set State Of The UI Switch To Load
+        if UserDefaults.standard.bool(forKey: "isEditable") == true {
+            amountIsEditableUISwitch.isOn = true
+        } else {
+            amountIsEditableUISwitch.isOn = false
+        }
+        
+        
     }
     
     
+    //Creates A UI Switch Button Which Allows The Amount To Be Or Not Be Editable
+    func generateUISwtich() -> UISwitch {
+        
+        let uiSwitch = UISwitch()
+        
+        //UI Switch Frame Attributes
+        uiSwitch.frame = CGRect(x: CGFloat( (170 / 414) * screenWidth), y: CGFloat( (510 / 896) * screenHeight), width: 0, height: 0)
+        //NOTE : As Evident Above, The Width And Height Of A UI Switch Is Not Customisable Without CGAffineTransform As Shown Below
+        uiSwitch.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+        
+        uiSwitch.addTarget(self, action: #selector(switchValueDidChange(_:)), for: .valueChanged)
+        return uiSwitch
+        
+    }
     
     
-    //When The User Taps On The Screen
+    //The Action Which Occurs When The UI Switch Is Clicked
+    @objc func switchValueDidChange(_ sender: UISwitch) {
+        
+        if (sender.isOn == true) {
+            UserDefaults.standard.set(true, forKey: "isEditable")
+        } else {
+            UserDefaults.standard.set(false, forKey: "isEditable")
+        }
+        
+    }
+    
+    
+    //The Action Which Occurs When The User Taps On The Screen
     @objc func viewTapped(gestureRecognizer : UITapGestureRecognizer) {
         
         //Stores The UEN & Company Name In User Defaults
@@ -131,7 +176,7 @@ class SettingsViewController: UIViewController {
         }
         
     }
-    
+
 
 }
 

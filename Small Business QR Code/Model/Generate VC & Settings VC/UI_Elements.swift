@@ -27,7 +27,7 @@ struct UI_Elements {
     
     
     //Function Which Returns A Text Field Label
-    func getTextFieldLabel(text : String, textAlignment : NSTextAlignment, fontName : String, fontSize : CGFloat, textColor : UIColor, numberOfLines : Int, adjustsFontSizeToFitWidth : Bool, frameX : CGFloat, frameY : CGFloat, frameWidth : CGFloat, frameHeight : CGFloat, backgroundColor : UIColor) -> UILabel {
+    func getTextFieldLabel(text : String, textAlignment : NSTextAlignment, fontName : String, fontSize : CGFloat, textColor : UIColor, numberOfLines : Int, adjustsFontSizeToFitWidth : Bool, frameX : CGFloat, frameY : CGFloat, frameWidth : CGFloat, frameHeight : CGFloat, backgroundColor : UIColor, borderWidth : CGFloat) -> UILabel {
         
         let textFieldLabel = UILabel()
         
@@ -44,12 +44,14 @@ struct UI_Elements {
         
         //Text Field Label Background / Border Attributes
         textFieldLabel.backgroundColor = backgroundColor
+        textFieldLabel.layer.borderWidth = borderWidth
         
         //Text Field Label Design If The Screen Is In Dark Or Light Mode
         if screenIsInDarkMode == true && screenIsInLightMode == false {
             
             textFieldLabel.textColor = .yellow
             textFieldLabel.backgroundColor = .black
+            textFieldLabel.layer.borderWidth = 0.0
             
         } else if screenIsInLightMode == true && screenIsInDarkMode == false {
             
@@ -92,6 +94,8 @@ struct UI_Elements {
             
             //Changes The Opacity Of The Placeholder Text
             textField.attributedPlaceholder = NSAttributedString(string: placeholderText, attributes: [NSAttributedString.Key.foregroundColor : UIColor.gray.withAlphaComponent(1)])
+            //Removes Border Width
+            textField.layer.borderWidth = 0.0
             
         } else if screenIsInLightMode == true && screenIsInDarkMode == false {
             

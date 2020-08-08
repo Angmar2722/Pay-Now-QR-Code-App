@@ -79,7 +79,12 @@ struct MiscFunctions {
         
         let last4CharactersOfUEN = UEN.suffix(4)
         
-        extraInfoLabel.text = "\(companyName) (\(last4CharactersOfUEN)) $\(transactionAmount)"
+        //If Amount Is $0.00, The Extra Info Should Not Show The Amount
+        if transactionAmount != "0.00" {
+            extraInfoLabel.text = "\(companyName) (\(last4CharactersOfUEN)) $\(transactionAmount)"
+        } else {
+            extraInfoLabel.text = "\(companyName) (\(last4CharactersOfUEN))"
+        }
         
         extraInfoLabel.font = UIFont(name: "AppleSDGothicNeo-Bold", size: CGFloat( (22 / 896) * screenHeight ))
         extraInfoLabel.textColor = UIColor.white
