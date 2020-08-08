@@ -160,10 +160,10 @@ class GenerateViewController: UIViewController {
         let uenString = UserDefaults.standard.string(forKey: "UEN_Text")
         var isEditableBool = UserDefaults.standard.bool(forKey: "isEditable")
         
-        if companyNameString != Optional("") && uenString != Optional("") {
+        if companyNameString != Optional("") && uenString != Optional("") && companyNameString != nil && uenString != nil {
             
             
-            if referenceNumberTextField?.text != Optional("") {
+            if referenceNumberTextField?.text != Optional("") && referenceNumberTextField?.text != nil {
                 
                 //Constats To Store The Transaction Amount & Reference Number
                 var transactionAmount : String
@@ -224,7 +224,7 @@ class GenerateViewController: UIViewController {
             
         } else {
             
-            callAlert(title: "Cannot Generate QR Code", message: "Please Make Sure Than You Have Filled In Your Company Name And Its UEN In The Settings Page", timeDeadline: 20)
+            callAlert(title: "Cannot Generate QR Code", message: "Please Make Sure Than You Have Filled In Both Your Company Name And Its UEN In The Settings Page", timeDeadline: 20)
             
         }
         

@@ -81,7 +81,7 @@ struct MiscFunctions {
         
         //If Amount Is $0.00, The Extra Info Should Not Show The Amount
         if transactionAmount != "0.00" {
-            extraInfoLabel.text = "\(companyName) (\(last4CharactersOfUEN)) $\(transactionAmount)"
+            extraInfoLabel.text = "\(companyName) (*\(last4CharactersOfUEN)) $\(transactionAmount)"
         } else {
             extraInfoLabel.text = "\(companyName) (\(last4CharactersOfUEN))"
         }
