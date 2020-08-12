@@ -235,33 +235,7 @@ class GenerateViewController: UIViewController {
     //When The User Taps On The Screen, The Editor (Such As A Keyboard Or A Date Picker) Is Dismissed
     @objc func viewTapped(gestureRecognizer : UITapGestureRecognizer) {
     
-        //The If Statement Below Checks If The Text Entered In The Transaction Amount Text Field Is A Number And If It Is, It Automatically Adds 2 Decimal Places To The Number, Even If It Is An Integer Or Has 1 Decimal Place. If It Is Not A Number, The Keyboard Is Not Dismissed And The User Is Prompted To Enter A Number
-        if transactionAmountTextField?.isEditing == true &&  transactionAmountTextField?.text != Optional("") {
-            
-            if let amount = Double((transactionAmountTextField?.text)!) {
-                
-                //Since The Maximum Number Of Characters Allowed Under The Pay Now QR Code Format Is 13, The Lines Below Prevents the User From Inputting An Integer With 11-13 Characters And Then A .00 Is Added Which Gives 16 Characters Which is More Than The Maximum
-                //The line below contains the number 1000000000000 which has 11 digits
-                if amount < 10000000000 {
-                    transactionAmountTextField?.text = String(format: "%.2f", arguments: [amount])
-                    view.endEditing(true)
-                } else {
-                    callAlert(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number of characters allowed is 13 including the decimal point.", timeDeadline: 20)
-                    view.endEditing(false)
-                }
-                
-                
-            } else {
-            
-                callAlert(title: "Amount Entered Is Not A Number", message: "The Transaction Amount Has To Be A Number Like 99.99 or 99", timeDeadline: 15)
-                view.endEditing(false)
-                
-            }
-
-        } else {
-            //The Line Below Dismisses Editing For All Other Instances Excluding The Transaction Amount Text Field (So For The Expiry Date Or Reference Number Text Field etc.)
-            view.endEditing(true)
-        }
+        view.endEditing(true)
         
     }
     
@@ -415,16 +389,37 @@ extension GenerateViewController : UITextFieldDelegate {
 
     }
     
-   
-    func textFieldDidEndEditing(_ textField: UITextField) {
+    
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
         
-        //The Line Below Makes Sure That 2 Decimal Places Are Added In The Transaction Amount Tax Field Even If The User Taps On Another Text Field To Exit The Transaction Text Field And Select The Other Text Field
-        if let amount = Double((transactionAmountTextField?.text)!) {
+        //The If Statement Below Checks If The Text Entered In The Transaction Amount Text Field Is A Number And If It Is, It Automatically Adds 2 Decimal Places To The Number, Even If It Is An Integer Or Has 1 Decimal Place. If It Is Not A Number, The Keyboard Is Not Dismissed And The User Is Prompted To Enter A Number
+        if transactionAmountTextField?.isEditing == true &&  transactionAmountTextField?.text != Optional("") {
+            
+            if let amount = Double((transactionAmountTextField?.text)!) {
+                
+                //Since The Maximum Number Of Characters Allowed Under The Pay Now QR Code Format Is 13, The Lines Below Prevents the User From Inputting An Integer With 11-13 Characters And Then A .00 Is Added Which Gives 16 Characters Which is More Than The Maximum
+                //The line below contains the number 1000000000000 which has 11 digits
                 if amount < 10000000000 {
                     transactionAmountTextField?.text = String(format: "%.2f", arguments: [amount])
+                    return true
+                } else {
+                    callAlert(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number of characters allowed before the decimal point is 10.", timeDeadline: 30)
+                    return false
                 }
+                
+                
+            } else {
+            
+                callAlert(title: "Amount Entered Is Not A Number", message: "The Transaction Amount Has To Be A Number Like 99.99 or 99", timeDeadline: 15)
+                return false
+                
+            }
+
+        } else {
+            //The Line Below Dismisses Editing For All Other Instances Excluding The Transaction Amount Text Field (So For The Expiry Date Or Reference Number Text Field etc.)
+            return true
         }
-      
+                
     }
     
     
