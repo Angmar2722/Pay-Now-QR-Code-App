@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import PayNowQRSwift
 
 class GenerateViewController: UIViewController {
     
@@ -182,6 +183,7 @@ class GenerateViewController: UIViewController {
                 let finalCompanyNameString = (companyNameString)!
                 let finalUENString = (uenString)!
                 
+                //Fetches The Expiry Date If It Is Entered
                 var format_YYYY_DD_MM_Date : String
                 if expiryDateTextField?.text != Optional("") {
                     format_YYYY_DD_MM_Date = miscFunctions.getFormattedDate(dateText: expiryDateTextField?.text)
@@ -190,8 +192,7 @@ class GenerateViewController: UIViewController {
                 }
                 
                 //Fetches The Final Pay Now QR Code String From The 'PayNowQRString' Model
-                let payNowQRString = PayNowQRString(_beneficiaryType: "2", _beneficiary: "\(finalUENString)", _beneficiaryName: "\(finalCompanyNameString)", amount: "\(transactionAmount)", reference: "\(referenceNumber)", amountIsEditable: isEditableBool, _expiryDate: "\(format_YYYY_DD_MM_Date)")
-                let finalPayNowQRString = payNowQRString.getPayNowQRString()
+                let finalPayNowQRString = payNowQRString(_beneficiaryType: .UEN, _beneficiary: finalUENString, _beneficiaryName: finalCompanyNameString, amount: transactionAmount, reference: referenceNumber, amountIsEditable: isEditableBool, _expiryDate: format_YYYY_DD_MM_Date)
                 
                 //Calculating The Width And Height Of The QR Code As Well As The X Co-Ordinate Of The Image View
                 widthAndHeightOfQRCode = (85/100) * (makeQRCodeButton?.frame.width)!
