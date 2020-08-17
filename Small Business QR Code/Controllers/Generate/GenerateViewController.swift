@@ -14,8 +14,6 @@ class GenerateViewController: UIViewController {
     //Initializing Other View Controller Objects
     var settingsViewController : SettingsViewController?
     
-    //Initializing Accompanying Model Files
-    let miscFunctions = MiscFunctions()
     
     //Dimensions of Device Screen
     let screenWidth = UIScreen.main.bounds.width
@@ -36,8 +34,8 @@ class GenerateViewController: UIViewController {
 
     var makeQRCodeButton : UIButton?
     var widthAndHeightOfQRCode : CGFloat?
+    var format_YYYY_DD_MM_Date : Date?
     var actualImageView : UIImageView?
-    var payNowLogoImageView : UIImageView?
     
     
     //Initializing Screen Mode Variables
@@ -167,12 +165,12 @@ class GenerateViewController: UIViewController {
             if referenceNumberTextField?.text != Optional("") && referenceNumberTextField?.text != nil {
                 
                 //Constats To Store The Transaction Amount & Reference Number
-                var transactionAmount : String
+                var transactionAmount : CGFloat
                 if transactionAmountTextField?.text != Optional("") {
-                    transactionAmount = (transactionAmountTextField?.text)!
+                    transactionAmount = CGFloat(Double((transactionAmountTextField?.text)!)!)
                 } else {
                     //If Amount Is Left Unfilled, The Amount Is Set As $0.00 And The Amount Is Editable Regardless Of The Settings
-                    transactionAmount = "0.00"
+                    transactionAmount = CGFloat(0.00)
                     isEditableBool = true
                 }
                 let referenceNumber = (referenceNumberTextField?.text)!
@@ -184,34 +182,40 @@ class GenerateViewController: UIViewController {
                 let finalUENString = (uenString)!
                 
                 //Fetches The Expiry Date If It Is Entered
-                var format_YYYY_DD_MM_Date : String
-                if expiryDateTextField?.text != Optional("") {
-                    format_YYYY_DD_MM_Date = miscFunctions.getFormattedDate(dateText: expiryDateTextField?.text)
+                if expiryDateTextField?.text == Optional("") {
+                    format_YYYY_DD_MM_Date = nil
                 } else {
-                    format_YYYY_DD_MM_Date = "nil"
+                    format_YYYY_DD_MM_Date = format_YYYY_DD_MM_Date!
                 }
-                
-                //Fetches The Final Pay Now QR Code String From The 'PayNowQRString' Model
-                let finalPayNowQRString = payNowQRString(_beneficiaryType: .UEN, _beneficiary: finalUENString, _beneficiaryName: finalCompanyNameString, amount: transactionAmount, reference: referenceNumber, amountIsEditable: isEditableBool, _expiryDate: format_YYYY_DD_MM_Date)
+            
                 
                 //Calculating The Width And Height Of The QR Code As Well As The X Co-Ordinate Of The Image View
                 widthAndHeightOfQRCode = (85/100) * (makeQRCodeButton?.frame.width)!
                 let qrCodeXCordPadding = ( (makeQRCodeButton?.frame.width)! - widthAndHeightOfQRCode! ) / 2
                 let imageViewXPos = (makeQRCodeButton?.frame.minX)! + qrCodeXCordPadding
                 
+                
                 //Creates A Placeholder Image View To Send To The Generate QR Code Function
                 let imageViewToHouseQRCode = UIImageView()
                 imageViewToHouseQRCode.frame = CGRect(x: CGFloat( (imageViewXPos / 414) * screenWidth), y: CGFloat( (420 / 896) * screenHeight), width: widthAndHeightOfQRCode!, height: widthAndHeightOfQRCode! + CGFloat( (40 / 896) * screenHeight ))
                 
-                //Constants Storing 3 Images To Be Merged
-                let qrCodeImage = miscFunctions.generateQRCode(from: "\(finalPayNowQRString)", with: imageViewToHouseQRCode)!
-                let payNowLogo = #imageLiteral(resourceName: "Pay Now Logo")
-                let extraInfoLabelImage = miscFunctions.getExtraInfoLabelImage(companyName: finalCompanyNameString, UEN: finalUENString, transactionAmount: transactionAmount, qrCodeWidthAndHeight: widthAndHeightOfQRCode!)
+                //Calculates The Bottom Text To Add To The Label Below The QR Code
+                var bottomText : String
                 
-                let finalMergedImage = miscFunctions.getFinalMergedImage(imageViewWidth: imageViewToHouseQRCode.frame.width, imageViewHeight: imageViewToHouseQRCode.frame.height, qrCodeWidthAndHeight: widthAndHeightOfQRCode!, qrCodeImage: qrCodeImage, payNowLogoImage: payNowLogo, extraInfoLabelImage: extraInfoLabelImage)
-                            
+                let last4CharactersOfUEN = finalUENString.suffix(4)
+                    //If Amount Is $0.00, The Extra Info Should Not Show The Amount
+                if transactionAmount != CGFloat(0.00) {
+                    bottomText = "\(finalCompanyNameString) (*\(last4CharactersOfUEN)) $\(transactionAmount)"
+                } else {
+                    bottomText = "\(finalCompanyNameString) (*\(last4CharactersOfUEN))"
+                }
+                
+                
+                let finalImage = payNowQRImage(_beneficiaryType: .UEN, _beneficiary: finalUENString, _beneficiaryName: finalCompanyNameString, amount: transactionAmount, reference: referenceNumber, amountIsEditable: isEditableBool, _expiryDate: format_YYYY_DD_MM_Date, qrWidthAndHeight: widthAndHeightOfQRCode!, bottomLabelText: bottomText)
+                
+                
                 //Creates The Actual Image View To Which The Merged Image Is Added To
-                actualImageView = UIImageView(image: finalMergedImage)
+                actualImageView = UIImageView(image: finalImage)
                 actualImageView!.frame = imageViewToHouseQRCode.frame
                 view.addSubview(actualImageView!)
                 
@@ -245,8 +249,8 @@ class GenerateViewController: UIViewController {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd/MM/yyyy"
-        
         expiryDateTextField?.text = dateFormatter.string(from: datePicker.date)
+        format_YYYY_DD_MM_Date = datePicker.date
         
     }
     

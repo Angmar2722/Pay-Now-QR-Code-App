@@ -18,7 +18,6 @@
 		6A1BC38C24C6923E00839930 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6A1BC38A24C6923E00839930 /* LaunchScreen.storyboard */; };
 		6A1BC39724C693D500839930 /* HistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A1BC39624C693D500839930 /* HistoryViewController.swift */; };
 		6A1BC39924C6954500839930 /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A1BC39824C6954500839930 /* TabBarViewController.swift */; };
-		6A3F1C6924DAC4D900C24945 /* MiscFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A3F1C6824DAC4D900C24945 /* MiscFunctions.swift */; };
 		6A4C20D124E7699C00E86010 /* PayNowQRSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6A4C20D024E7699C00E86010 /* PayNowQRSwift */; };
 /* End PBXBuildFile section */
 
@@ -36,7 +35,6 @@
 		6A1BC38D24C6923E00839930 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6A1BC39624C693D500839930 /* HistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewController.swift; sourceTree = "<group>"; };
 		6A1BC39824C6954500839930 /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
-		6A3F1C6824DAC4D900C24945 /* MiscFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiscFunctions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,7 +143,6 @@
 		6A3F1C6724DAC4A100C24945 /* Generate VC & Settings VC */ = {
 			isa = PBXGroup;
 			children = (
-				6A3F1C6824DAC4D900C24945 /* MiscFunctions.swift */,
 				6A0267AF24DCE0730026C63E /* UI_Elements.swift */,
 			);
 			path = "Generate VC & Settings VC";
@@ -233,7 +230,6 @@
 				6A0267B024DCE0730026C63E /* UI_Elements.swift in Sources */,
 				6A1BC37B24C6922A00839930 /* AppDelegate.swift in Sources */,
 				6A1BC39724C693D500839930 /* HistoryViewController.swift in Sources */,
-				6A3F1C6924DAC4D900C24945 /* MiscFunctions.swift in Sources */,
 				6A1BC39924C6954500839930 /* TabBarViewController.swift in Sources */,
 				6A1BC37D24C6922A00839930 /* SceneDelegate.swift in Sources */,
 				6A1BC38724C6922A00839930 /* Small_Business_QR_Code.xcdatamodeld in Sources */,

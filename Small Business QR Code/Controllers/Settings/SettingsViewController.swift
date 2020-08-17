@@ -9,10 +9,7 @@
 import UIKit
 
 class SettingsViewController: UIViewController {
-    
-    
-    //Initializing Accompanying Model Files
-    let miscFunctions = MiscFunctions()
+
     
     //Dimensions of Device Screen
     let screenWidth = UIScreen.main.bounds.width
