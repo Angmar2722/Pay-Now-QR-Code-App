@@ -64,33 +64,6 @@
             </objects>
             <point key="canvasLocation" x="864" y="1497"/>
         </scene>
-        <!--History View Controller-->
-        <scene sceneID="Joh-z9-H69">
-            <objects>
-                <viewController id="QxX-LX-qm5" customClass="HistoryViewController" customModule="Small_Business_QR_Code" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="5vV-fG-o3N">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                        <viewLayoutGuide key="safeArea" id="MHm-y1-Jal"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="xmL-Jm-eqh">
-                        <barButtonItem key="leftBarButtonItem" title="Delete" image="trash" catalog="system" id="6Yh-NN-HRB">
-                            <connections>
-                                <action selector="deleteIconPressed:" destination="QxX-LX-qm5" id="eaW-mG-bv3"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Generate" image="qrcode" catalog="system" id="kzp-2Y-BL5">
-                            <connections>
-                                <action selector="generateIconPressed:" destination="QxX-LX-qm5" id="lua-p1-zDu"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="5SK-fE-wtY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1838" y="1497"/>
-        </scene>
         <!--Tab Bar View Controller-->
         <scene sceneID="yl2-sM-qoP">
             <objects>
@@ -141,12 +114,47 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="QxX-LX-qm5" kind="relationship" relationship="rootViewController" id="xoe-KG-a06"/>
+                        <segue destination="r2W-kJ-YwP" kind="relationship" relationship="rootViewController" id="cwM-ce-x1d"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gZ1-vp-McG" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1837.68115942029" y="687.72321428571422"/>
+        </scene>
+        <!--History Table View Controller-->
+        <scene sceneID="lZK-5t-6RE">
+            <objects>
+                <tableViewController id="r2W-kJ-YwP" customClass="HistoryTableViewController" customModule="Small_Business_QR_Code" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="yym-Cc-UpH">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="U06-8u-dkH">
+                                <rect key="frame" x="0.0" y="28" width="414" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="U06-8u-dkH" id="NX7-Ra-bbS">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="r2W-kJ-YwP" id="bXp-t6-FxR"/>
+                            <outlet property="delegate" destination="r2W-kJ-YwP" id="s3s-PG-kSx"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="L9v-5e-nlo">
+                        <barButtonItem key="leftBarButtonItem" title="Delete" image="trash" catalog="system" id="XOj-hB-fB7">
+                            <connections>
+                                <action selector="deleteIconPressed:" destination="r2W-kJ-YwP" id="zYk-WP-gbh"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="j2p-Av-wOF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1838" y="1497"/>
         </scene>
     </scenes>
     <resources>

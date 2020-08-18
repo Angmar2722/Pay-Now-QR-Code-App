@@ -288,15 +288,27 @@ class GenerateViewController: UIViewController {
     
     
     @IBAction func copyPressed(_ sender: UIBarButtonItem) {
-        UIPasteboard.general.image = actualImageView?.image
-        callAlert(title: "QR Code Successfully Copied!", message: "", timeDeadline: 10)
+        
+        if actualImageView?.image != nil {
+            UIPasteboard.general.image = actualImageView?.image
+            callAlert(title: "QR Code Successfully Copied!", message: "", timeDeadline: 10)
+        } else {
+            callAlert(title: "Nothing To Copy!", message: "No QR Code Has Been Generated To Be Copied", timeDeadline: 20)
+        }
+        
     }
     
     
     @IBAction func shareIconPressed(_ sender: UIBarButtonItem) {
-        let arrayOfImagesToShare = [actualImageView?.image]
-        let ac = UIActivityViewController(activityItems: arrayOfImagesToShare as [Any], applicationActivities: nil)
-        present(ac, animated: true)
+        
+        if actualImageView?.image != nil {
+            let arrayOfImagesToShare = [actualImageView?.image]
+            let ac = UIActivityViewController(activityItems: arrayOfImagesToShare as [Any], applicationActivities: nil)
+            present(ac, animated: true)
+        } else {
+            callAlert(title: "Nothing To Share!", message: "No QR Code Has Been Generated To Share", timeDeadline: 20)
+        }
+        
     }
     
     
