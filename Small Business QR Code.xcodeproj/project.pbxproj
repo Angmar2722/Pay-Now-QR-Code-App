@@ -70,7 +70,6 @@
 			children = (
 				6A1BC37A24C6922A00839930 /* AppDelegate.swift */,
 				6A1BC37C24C6922A00839930 /* SceneDelegate.swift */,
-				6AA4A24C24EB886A006A9F71 /* Data Model */,
 				6A1BC39424C6936500839930 /* Model */,
 				6A1BC39324C6935A00839930 /* View */,
 				6A1BC39524C6939100839930 /* Controllers */,
@@ -92,6 +91,7 @@
 		6A1BC39424C6936500839930 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				6AA4A24C24EB886A006A9F71 /* Data Model */,
 				6A3F1C6724DAC4A100C24945 /* Generate VC & Settings VC */,
 			);
 			path = Model;
@@ -385,6 +385,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = Q78SN8P897;
 				INFOPLIST_FILE = "Small Business QR Code/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -403,6 +404,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = Q78SN8P897;
 				INFOPLIST_FILE = "Small Business QR Code/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (

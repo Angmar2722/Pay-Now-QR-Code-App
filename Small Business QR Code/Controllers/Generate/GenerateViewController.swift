@@ -389,9 +389,9 @@ extension GenerateViewController : UITextFieldDelegate {
 
                 let currentReferenceNumberText = referenceNumberText + string
 
-                if currentReferenceNumberText.count > 30 {
+                if currentReferenceNumberText.count > 60 {
                     
-                    callAlert(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number allowed is 30", timeDeadline: 20)
+                    callAlert(title: "You Have Reached The Character Limit", message: "Please Stop Adding More Characters. The maximum number allowed is 60", timeDeadline: 20)
                     return false
                     
                 }
