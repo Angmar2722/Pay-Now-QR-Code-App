@@ -275,7 +275,7 @@ class GenerateViewController: UIViewController {
         transactionAmountTextField?.text = ""
         referenceNumberTextField?.text = ""
         expiryDateTextField?.text = ""
-        self.actualImageView?.removeFromSuperview()
+        actualImageView?.image = nil
     }
     
     
@@ -283,7 +283,7 @@ class GenerateViewController: UIViewController {
         transactionAmountTextField?.text = ""
         referenceNumberTextField?.text = ""
         expiryDateTextField?.text = ""
-        self.actualImageView?.removeFromSuperview()
+        actualImageView?.image = nil
     }
     
     
