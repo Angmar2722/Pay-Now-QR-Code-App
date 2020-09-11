@@ -8,6 +8,7 @@
 
 import UIKit
 
+//This Struct Provides Functions For Generating User Interface Elements Which Are : Text Fields, Labels
 
 struct UI_Elements {
     
@@ -27,40 +28,40 @@ struct UI_Elements {
     
     
     //Function Which Returns A Text Field Label
-    func getTextFieldLabel(text : String, textAlignment : NSTextAlignment, fontName : String, fontSize : CGFloat, textColor : UIColor, numberOfLines : Int, adjustsFontSizeToFitWidth : Bool, frameX : CGFloat, frameY : CGFloat, frameWidth : CGFloat, frameHeight : CGFloat, backgroundColor : UIColor, borderWidth : CGFloat) -> UILabel {
+    func getLabel(text : String, textAlignment : NSTextAlignment, fontName : String, fontSize : CGFloat, textColor : UIColor, numberOfLines : Int, adjustsFontSizeToFitWidth : Bool, frameX : CGFloat, frameY : CGFloat, frameWidth : CGFloat, frameHeight : CGFloat, backgroundColor : UIColor, borderWidth : CGFloat) -> UILabel {
         
-        let textFieldLabel = UILabel()
+        let label = UILabel()
         
         //Label Text Features
-        textFieldLabel.text = text
-        textFieldLabel.textAlignment = textAlignment
-        textFieldLabel.font = UIFont(name: fontName, size: CGFloat( (fontSize / 896) * screenHeight ))
-        textFieldLabel.textColor = textColor
-        textFieldLabel.numberOfLines = numberOfLines
-        textFieldLabel.adjustsFontSizeToFitWidth = adjustsFontSizeToFitWidth
+        label.text = text
+        label.textAlignment = textAlignment
+        label.font = UIFont(name: fontName, size: CGFloat( (fontSize / 896) * screenHeight ))
+        label.textColor = textColor
+        label.numberOfLines = numberOfLines
+        label.adjustsFontSizeToFitWidth = adjustsFontSizeToFitWidth
         
         //Text Field Label Frame Attributes
-        textFieldLabel.frame = CGRect(x: CGFloat( (frameX / 414) * screenWidth), y: CGFloat( (frameY / 896) * screenHeight), width: CGFloat( (frameWidth / 414) * screenWidth), height: CGFloat( (frameHeight / 896) * screenHeight))
+        label.frame = CGRect(x: CGFloat( (frameX / 414) * screenWidth), y: CGFloat( (frameY / 896) * screenHeight), width: CGFloat( (frameWidth / 414) * screenWidth), height: CGFloat( (frameHeight / 896) * screenHeight))
         
         //Text Field Label Background / Border Attributes
-        textFieldLabel.backgroundColor = backgroundColor
-        textFieldLabel.layer.borderWidth = borderWidth
+        label.backgroundColor = backgroundColor
+        label.layer.borderWidth = borderWidth
         
         //Text Field Label Design If The Screen Is In Dark Or Light Mode
         if screenIsInDarkMode == true && screenIsInLightMode == false {
             
-            textFieldLabel.textColor = .yellow
-            textFieldLabel.backgroundColor = .black
-            textFieldLabel.layer.borderWidth = 0.0
+            label.textColor = .yellow
+            label.backgroundColor = .black
+            label.layer.borderWidth = 0.0
             
         } else if screenIsInLightMode == true && screenIsInDarkMode == false {
             
-            textFieldLabel.textColor = textColor
-            textFieldLabel.backgroundColor = backgroundColor
+            label.textColor = textColor
+            label.backgroundColor = backgroundColor
             
         }
         
-        return textFieldLabel
+        return label
         
     }
     

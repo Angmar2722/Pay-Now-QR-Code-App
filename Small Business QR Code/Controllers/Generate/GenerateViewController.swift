@@ -74,9 +74,9 @@ class GenerateViewController: UIViewController {
         let ui_Elements = UI_Elements(darkMode: isInDarkMode!, lightMode: isInLightMode!)
         
         //Adds The Reference Number, Transaction Amount And Expiry Date Labels
-        transactionAmountTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Amount ($)", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 130, frameWidth: 120, frameHeight: 40, backgroundColor: .white, borderWidth: 0.0)
-        referenceNumberTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Ref No", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 190, frameWidth: 120, frameHeight: 40, backgroundColor: .white, borderWidth: 0.0)
-        expiryDateTextFieldLabel = ui_Elements.getTextFieldLabel(text: "Exp Date", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 250, frameWidth: 120, frameHeight: 40, backgroundColor: .white, borderWidth: 0.0)
+        transactionAmountTextFieldLabel = ui_Elements.getLabel(text: "Amount ($)", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 130, frameWidth: 120, frameHeight: 40, backgroundColor: .white, borderWidth: 0.0)
+        referenceNumberTextFieldLabel = ui_Elements.getLabel(text: "Ref No", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 190, frameWidth: 120, frameHeight: 40, backgroundColor: .white, borderWidth: 0.0)
+        expiryDateTextFieldLabel = ui_Elements.getLabel(text: "Exp Date", textAlignment: .natural, fontName: "AppleSDGothicNeo-Bold", fontSize: 22, textColor: .black, numberOfLines: 1, adjustsFontSizeToFitWidth: true, frameX: 30, frameY: 250, frameWidth: 120, frameHeight: 40, backgroundColor: .white, borderWidth: 0.0)
         
         view.addSubview(transactionAmountTextFieldLabel!)
         view.addSubview(referenceNumberTextFieldLabel!)
@@ -148,18 +148,48 @@ class GenerateViewController: UIViewController {
     //The Action Which Occurs When The Generate QR Code Button Is Clicked
     @objc func generateQRCodeButtonClicked(sender:UIButton) {
         
+        
         //Dismisses The Date Picker If the User Clicks On The Generate QR Button While The Date Picker Is Selected
         view.endEditing(true)
         
         //Removes Any Existing Image When The Generate Button Is Pressed
         actualImageView?.image = nil
         
-        //Fetches The Company Name, UEN & Whether Amount Is Editable Bool From The Settings View Controller
+        
+        //Fetches The Company Or Person's Name From The Settings View Controller
         let companyNameString = UserDefaults.standard.string(forKey: "Company_Name_Text")
-        let uenString = UserDefaults.standard.string(forKey: "UEN_Text")
+        let mobileNameString = UserDefaults.standard.string(forKey: "Mobile_Name_Text")
+        
+        //The Variable To Store The Company Name / Person's Name Text Will Store The Company Name As A Default (As If Nothing Is Selected, the UEN mode is selected as a default)
+        var companyPersonNameString = UserDefaults.standard.string(forKey: "Company_Name_Text")
+        
+        //Fetches The UEN Or Mobile Number From The Settings View Controller
+        var uenMobileString = UserDefaults.standard.string(forKey: "UEN_Text")
+        
+        if UserDefaults.standard.integer(forKey: "uenMobileSelectedIndexForSegmentedControl") == 0 {
+            
+            uenMobileString = UserDefaults.standard.string(forKey: "UEN_Text")
+            companyPersonNameString = companyNameString
+            
+        } else if UserDefaults.standard.integer(forKey: "uenMobileSelectedIndexForSegmentedControl") == 1 {
+            
+            companyPersonNameString = mobileNameString
+            let nonPlus65MobileNumber = UserDefaults.standard.string(forKey: "Mobile_Text")
+            
+            if nonPlus65MobileNumber != Optional("") && nonPlus65MobileNumber != nil {
+                uenMobileString = "+65\(nonPlus65MobileNumber!)"
+            } else {
+                uenMobileString = Optional("")
+            }
+            
+        }
+        
+        
+        //Fetches Whether Amount Is Editable Bool From The Settings View Controller
         var isEditableBool = UserDefaults.standard.bool(forKey: "isEditable")
         
-        if companyNameString != Optional("") && uenString != Optional("") && companyNameString != nil && uenString != nil {
+        
+        if companyPersonNameString != Optional("") && uenMobileString != Optional("") && companyPersonNameString != nil && uenMobileString != nil {
             
             
             if referenceNumberTextField?.text != Optional("") && referenceNumberTextField?.text != nil {
@@ -178,8 +208,9 @@ class GenerateViewController: UIViewController {
 
                 //For Testing Purposes : Qryptal UEN Is 201101550Z
                 //Fetches The Final Unwrapped Company Name & UEN String & Formatted Date
-                let finalCompanyNameString = (companyNameString)!
-                let finalUENString = (uenString)!
+                let finalNameString = companyPersonNameString!
+                let finalUENMobileString = (uenMobileString)!
+                
                 
                 //Fetches The Expiry Date If It Is Entered
                 if expiryDateTextField?.text == Optional("") {
@@ -202,16 +233,33 @@ class GenerateViewController: UIViewController {
                 //Calculates The Bottom Text To Add To The Label Below The QR Code
                 var bottomText : String
                 
-                let last4CharactersOfUEN = finalUENString.suffix(4)
-                    //If Amount Is $0.00, The Extra Info Should Not Show The Amount
+                //The Variable To Store The Last 4 Characters Of A UEN Or The Mobile Number Will Store The Last 4 Characters Of A UEN As A Default (As If Nothing Is Selected, the UEN mode is selected as a default)
+                var lastCharactersOfUENOrMobileNumber = String(finalUENMobileString.suffix(4))
+                if UserDefaults.standard.integer(forKey: "uenMobileSelectedIndexForSegmentedControl") == 0 {
+                    lastCharactersOfUENOrMobileNumber = String(finalUENMobileString.suffix(4))
+                } else if UserDefaults.standard.integer(forKey: "uenMobileSelectedIndexForSegmentedControl") == 1 {
+                    lastCharactersOfUENOrMobileNumber = String(finalUENMobileString.suffix(8))
+                }
+                
+                //If Amount Is $0.00, The Extra Info Should Not Show The Amount
                 if transactionAmount != CGFloat(0.00) {
-                    bottomText = "\(finalCompanyNameString) (*\(last4CharactersOfUEN)) $\(transactionAmount)"
+                    bottomText = "\(finalNameString) (*\(lastCharactersOfUENOrMobileNumber)) $\(transactionAmount)"
                 } else {
-                    bottomText = "\(finalCompanyNameString) (*\(last4CharactersOfUEN))"
+                    bottomText = "\(finalNameString) (*\(lastCharactersOfUENOrMobileNumber))"
                 }
                 
                 
-                let finalImage = payNowQRImage(_beneficiaryType: .UEN, _beneficiary: finalUENString, _beneficiaryName: finalCompanyNameString, amount: transactionAmount, reference: referenceNumber, amountIsEditable: isEditableBool, _expiryDate: format_YYYY_DD_MM_Date, qrWidthAndHeight: widthAndHeightOfQRCode!, bottomLabelText: bottomText)
+                var finalImage = payNowQRImage(_beneficiaryType: .UEN, _beneficiary: finalUENMobileString, _beneficiaryName: finalNameString, amount: transactionAmount, reference: referenceNumber, amountIsEditable: isEditableBool, _expiryDate: format_YYYY_DD_MM_Date, qrWidthAndHeight: widthAndHeightOfQRCode!, bottomLabelText: bottomText)
+                
+                if UserDefaults.standard.integer(forKey: "uenMobileSelectedIndexForSegmentedControl") == 0 {
+                    
+                    finalImage = payNowQRImage(_beneficiaryType: .UEN, _beneficiary: finalUENMobileString, _beneficiaryName: finalNameString, amount: transactionAmount, reference: referenceNumber, amountIsEditable: isEditableBool, _expiryDate: format_YYYY_DD_MM_Date, qrWidthAndHeight: widthAndHeightOfQRCode!, bottomLabelText: bottomText)
+                    
+                } else if UserDefaults.standard.integer(forKey: "uenMobileSelectedIndexForSegmentedControl") == 1 {
+                    
+                    finalImage = payNowQRImage(_beneficiaryType: .Mobile, _beneficiary: finalUENMobileString, _beneficiaryName: finalNameString, amount: transactionAmount, reference: referenceNumber, amountIsEditable: isEditableBool, _expiryDate: format_YYYY_DD_MM_Date, qrWidthAndHeight: widthAndHeightOfQRCode!, bottomLabelText: bottomText)
+                    
+                }
                 
                 
                 //Creates The Actual Image View To Which The Merged Image Is Added To
@@ -229,7 +277,15 @@ class GenerateViewController: UIViewController {
             
         } else {
             
-            callAlert(title: "Cannot Generate QR Code", message: "Please Make Sure Than You Have Filled In Both Your Company Name And Its UEN In The Settings Page", timeDeadline: 20)
+            if UserDefaults.standard.integer(forKey: "uenMobileSelectedIndexForSegmentedControl") == 0 {
+                
+                callAlert(title: "Cannot Generate QR Code", message: "Please Make Sure Than You Have Correctly Entered Both Your Company Name And Its UEN In The Settings Page", timeDeadline: 20)
+                
+            } else if UserDefaults.standard.integer(forKey: "uenMobileSelectedIndexForSegmentedControl") == 1 {
+                
+                callAlert(title: "Cannot Generate QR Code", message: "Please Make Sure Than You Have Correctly Entered Both Your Name And Your Mobile Number In The Settings Page", timeDeadline: 20)
+                
+            }
             
         }
         
