@@ -50,6 +50,7 @@ class SettingsViewController: UIViewController {
     
 
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
@@ -119,6 +120,7 @@ class SettingsViewController: UIViewController {
             uenMobileNumberTextField?.placeholder = "E.g. 201536938K"
             nameTextFieldLabel?.text = "Company Name"
             nameTextField?.placeholder = "E.g. Matsol"
+            uenMobileNumberTextField?.keyboardType = .default
             uenMobileUISegmentedControl?.selectedSegmentIndex = 0
             
             //Adds The Stored Company Name / UEN If Entered When The App Is Loaded
@@ -149,6 +151,7 @@ class SettingsViewController: UIViewController {
         } else {
             UserDefaults.standard.set(0, forKey: "uenMobileSelectedIndexForSegmentedControl")
             uenMobileUISegmentedControl?.selectedSegmentIndex = 0
+            uenMobileNumberTextField?.keyboardType = .default
         }
         
     }
@@ -193,9 +196,24 @@ class SettingsViewController: UIViewController {
         uiSegmentedControl_.frame = CGRect(x: CGFloat( (57 / 414) * screenWidth), y: CGFloat( (490 / 896) * screenHeight), width: CGFloat( (300 / 414) * screenWidth), height: CGFloat( (40 / 896) * screenHeight))
         
         //UI Segmented Control Color Features
-        uiSegmentedControl_.selectedSegmentTintColor = UIColor.systemBlue
-        uiSegmentedControl_.backgroundColor = UIColor.systemPink
-                
+        if isInDarkMode == false {
+            
+            uiSegmentedControl_.selectedSegmentTintColor = UIColor.systemTeal
+            uiSegmentedControl_.backgroundColor = UIColor.systemPink
+            
+        } else if isInDarkMode == true {
+            
+            let darkModeSelectedTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.red]
+            uiSegmentedControl_.setTitleTextAttributes(darkModeSelectedTextAttributes, for: .selected)
+            
+            let nonSelectedDarkModeTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.blue]
+            uiSegmentedControl_.setTitleTextAttributes(nonSelectedDarkModeTextAttributes, for: .normal)
+            
+            uiSegmentedControl_.selectedSegmentTintColor = UIColor.systemYellow
+            uiSegmentedControl_.backgroundColor = UIColor.white
+            
+        }
+        
         uiSegmentedControl_.addTarget(self, action: #selector(SettingsViewController.segmentedControlChanged(_:)), for: .valueChanged)
         return uiSegmentedControl_
         
@@ -209,6 +227,7 @@ class SettingsViewController: UIViewController {
             
             uenMobileTextFieldLabel?.text = "UEN"
             uenMobileNumberTextField?.placeholder = "E.g. 201536938K"
+            uenMobileNumberTextField?.keyboardType = .default
             nameTextFieldLabel?.text = "Company Name"
             nameTextField?.placeholder = "E.g. Matsol"
             UserDefaults.standard.set(0, forKey: "uenMobileSelectedIndexForSegmentedControl")
